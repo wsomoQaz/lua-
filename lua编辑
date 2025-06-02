@@ -1,0 +1,73 @@
+local player = game.Players.LocalPlayer
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "LuaEditor"
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 420, 0, 260)
+mainFrame.Position = UDim2.new(0.5, -210, 0.5, -130)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30,30,30)
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 28)
+title.BackgroundTransparency = 1
+title.Text = "Lua代码编辑器（可拖动）"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
+title.TextColor3 = Color3.fromRGB(255, 222, 40)
+title.Parent = mainFrame
+
+local textBox = Instance.new("TextBox")
+textBox.Position = UDim2.new(0, 10, 0, 38)
+textBox.Size = UDim2.new(1, -20, 0, 170)
+textBox.Text = ""
+textBox.ClearTextOnFocus = false
+textBox.MultiLine = true
+textBox.TextWrapped = true
+textBox.TextScaled = false
+textBox.Font = Enum.Font.Code
+textBox.TextSize = 16
+textBox.BackgroundColor3 = Color3.fromRGB(44,44,44)
+textBox.TextColor3 = Color3.fromRGB(240,240,240)
+textBox.Parent = mainFrame
+
+local copyButton = Instance.new("TextButton")
+copyButton.Size = UDim2.new(0, 120, 0, 38)
+copyButton.Position = UDim2.new(1, -130, 1, -48)
+copyButton.Text = "复制代码"
+copyButton.Font = Enum.Font.GothamBold
+copyButton.TextSize = 18
+copyButton.BackgroundColor3 = Color3.fromRGB(70, 130, 255)
+copyButton.TextColor3 = Color3.fromRGB(255,255,255)
+copyButton.Parent = mainFrame
+
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 36, 0, 36)
+closeButton.Position = UDim2.new(1, -42, 0, 2)
+closeButton.Text = "X"
+closeButton.Font = Enum.Font.GothamBold
+closeButton.TextSize = 22
+closeButton.BackgroundColor3 = Color3.fromRGB(200,60,60)
+closeButton.TextColor3 = Color3.fromRGB(255,255,255)
+closeButton.Parent = mainFrame
+
+closeButton.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
+end)
+
+copyButton.MouseButton1Click:Connect(function()
+    if setclipboard then
+        setclipboard(textBox.Text)
+        copyButton.Text = "已复制!"
+        wait(1)
+        copyButton.Text = "复制代码"
+    else
+        copyButton.Text = "无法复制"
+        wait(1)
+        copyButton.Text = "复制代码"
+    end
+end)
