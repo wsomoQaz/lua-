@@ -6,6 +6,7 @@ local hrp = character:WaitForChild("HumanoidRootPart")
 -- 名字检测（只允许特定玩家进入）
 if player.Name ~= "WSMOMQAZup" then
 if player.Name ~= "xipeigen886" then
+if player.Name ~= "zhjsjsjs61" then
 	-- 创建主GUI
 	local screenGui = Instance.new("ScreenGui")
 	screenGui.Name = "FakeKickUI"
