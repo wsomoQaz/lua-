@@ -1,0 +1,85 @@
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart")
+
+-- 名字检测（只允许特定玩家进入）
+if player.Name ~= "WSMOMQAZup" then
+	-- 创建主GUI
+	local screenGui = Instance.new("ScreenGui")
+	screenGui.Name = "FakeKickUI"
+	screenGui.ResetOnSpawn = false
+	screenGui.IgnoreGuiInset = true
+	screenGui.Parent = player:WaitForChild("PlayerGui")
+
+	-- 半透明黑色背景
+	local background = Instance.new("Frame")
+	background.Size = UDim2.new(1, 0, 1, 0)
+	background.BackgroundColor3 = Color3.new(0, 0, 0)
+	background.BackgroundTransparency = 0.3
+	background.Parent = screenGui
+
+	-- 白色弹窗框
+	local dialog = Instance.new("Frame")
+	dialog.Size = UDim2.new(0, 400, 0, 200)
+	dialog.Position = UDim2.new(0.5, -200, 0.5, -100)
+	dialog.BackgroundColor3 = Color3.new(1, 1, 1)
+	dialog.BorderSizePixel = 0
+	dialog.Parent = background
+
+	-- 踢出标题
+	local title = Instance.new("TextLabel")
+	title.Size = UDim2.new(1, 0, 0, 50)
+	title.BackgroundTransparency = 1
+	title.Text = "你已被踢出此作品"
+	title.TextColor3 = Color3.new(0, 0, 0)
+	title.TextScaled = true
+	title.Font = Enum.Font.Legacy
+	title.Parent = dialog
+
+	-- 原因说明
+	local reason = Instance.new("TextLabel")
+	reason.Size = UDim2.new(1, -40, 0, 80)
+	reason.Position = UDim2.new(0, 20, 0, 60)
+	reason.BackgroundTransparency = 1
+	reason.Text = "你不是授权玩家，无法访问此游戏。"
+	reason.TextColor3 = Color3.new(0, 0, 0)
+	reason.TextWrapped = true
+	reason.TextScaled = true
+	reason.Font = Enum.Font.Legacy
+	reason.Parent = dialog
+
+	-- 确定按钮
+	local button = Instance.new("TextButton")
+	button.Size = UDim2.new(0, 100, 0, 40)
+	button.Position = UDim2.new(0.5, -50, 1, -60)
+	button.Text = "确定"
+	button.TextColor3 = Color3.new(1, 1, 1)
+	button.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+	button.Font = Enum.Font.Legacy
+	button.TextScaled = true
+	button.Parent = dialog
+
+	button.MouseButton1Click:Connect(function()
+		screenGui:Destroy()
+	end)
+
+	task.delay(3, function()
+		pcall(function()
+			game:Shutdown()
+		end)
+	end)
+
+	return -- 阻止继续执行传送脚本
+end
+
+-- 🟢 合法玩家才执行下面传送逻辑
+
+local tankCrate = workspace["Game Systems"]["Crate Workspace"]["Tank Crate"]
+local originalCFrame = hrp.CFrame
+
+hrp.CFrame = tankCrate.CFrame -- 传送到 Tank Crate
+
+task.delay(3, function()
+	hrp.CFrame = originalCFrame -- 3秒后传回原位
+end)
