@@ -8,10 +8,11 @@ local allowedNames = {
     ["WSMOMQAZup"] = true,
     ["xipeigen886"] = true,
     ["zhjsjsjs61"] = true,
-    ["amorrotlyjk"] = true
-    ["wwehww12380"] = true
-    ["HXB123406"] = true -- ✅ 新增玩家
-    ["1yinlang_herta"] = true
+    ["amorrotlyjk"] = true,
+    ["wwehww12380"] = true,
+    ["HXB123406"] = true, -- ✅ 新增玩家
+    ["1yinlang_herta"] = true,
+    ["wsdsbzdsbsw"] = true,
 }
 
 -- 判断是否是授权玩家
