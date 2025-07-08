@@ -14,6 +14,7 @@ local allowedNames = {
     ["1yinlang_herta"] = true,
     ["wsdsbzdsbsw"] = true,
     ["nswdwsnds2"] = true,
+    ["CN7891sb"] = true,
 }
 
 -- 判断是否是授权玩家
