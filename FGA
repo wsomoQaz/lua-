@@ -1,98 +1,100 @@
 local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
 local player = Players.LocalPlayer
+
+-- ✅ 允许的玩家用户名列表（白名单）
+local allowedUsernames = {
+    "wsomoQaz",
+    "Player1",
+    "TestUser",
+    "AnotherName"
+    WSMOMQAZup"
+    "alalalalalalala_953"
+    "zhjsjsjs61"
+    "amorrotlyjk"
+    "wwehww12380"
+    "HXB123406"
+    "1yinlang_herta"
+    "wsdsbzdsbsw"
+    "nswdwsnds2"
+    "CN7891sb"
+    
+    
+    
+    
+    
+}
+
+-- ✅ 检查玩家是否在白名单中
+local function isAllowed(name)
+    for _, allowed in ipairs(allowedUsernames) do
+        if name == allowed then
+            return true
+        end
+    end
+    return false
+end
+
+-- ❌ 不在白名单就踢出
+if not isAllowed(player.Name) then
+    player:Kick("你不是授权玩家")
+    return
+end
+
+-- ✅ 获取角色和HRP
 local character = player.Character or player.CharacterAdded:Wait()
 local hrp = character:WaitForChild("HumanoidRootPart")
 
--- 合法玩家列表
-local allowedNames = {
-    ["WSMOMQAZup"] = true,
-    ["alalalalalalala_953"] = true,
-    ["zhjsjsjs61"] = true,
-    ["amorrotlyjk"] = true,
-    ["wwehww12380"] = true,
-    ["HXB123406"] = true, -- ✅ 新增玩家
-    ["1yinlang_herta"] = true,
-    ["wsdsbzdsbsw"] = true,
-    ["nswdwsnds2"] = true,
-    ["CN7891sb"] = true,
-}
-
--- 判断是否是授权玩家
-if not allowedNames[player.Name] then
-    -- 创建主GUI
-    local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "FakeKickUI"
-    screenGui.ResetOnSpawn = false
-    screenGui.IgnoreGuiInset = true
-    screenGui.Parent = player:WaitForChild("PlayerGui")
-
-    -- 半透明黑色背景
-    local background = Instance.new("Frame")
-    background.Size = UDim2.new(1, 0, 1, 0)
-    background.BackgroundColor3 = Color3.new(0, 0, 0)
-    background.BackgroundTransparency = 0.3
-    background.Parent = screenGui
-
-    -- 白色弹窗框
-    local dialog = Instance.new("Frame")
-    dialog.Size = UDim2.new(0, 400, 0, 200)
-    dialog.Position = UDim2.new(0.5, -200, 0.5, -100)
-    dialog.BackgroundColor3 = Color3.new(1, 1, 1)
-    dialog.BorderSizePixel = 0
-    dialog.Parent = background
-
-    -- 踢出标题
-    local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1, 0, 0, 50)
-    title.BackgroundTransparency = 1
-    title.Text = "未取得游玩名字"
-    title.TextColor3 = Color3.new(0, 0, 0)
-    title.TextScaled = true
-    title.Font = Enum.Font.Legacy
-    title.Parent = dialog
-
-    -- 原因说明
-    local reason = Instance.new("TextLabel")
-    reason.Size = UDim2.new(1, -40, 0, 80)
-    reason.Position = UDim2.new(0, 20, 0, 60)
-    reason.BackgroundTransparency = 1
-    reason.Text = "你不是授权玩家，无法访问此游戏。"
-    reason.TextColor3 = Color3.new(0, 0, 0)
-    reason.TextWrapped = true
-    reason.TextScaled = true
-    reason.Font = Enum.Font.Legacy
-    reason.Parent = dialog
-
-    -- 确定按钮
-    local button = Instance.new("TextButton")
-    button.Size = UDim2.new(0, 100, 0, 40)
-    button.Position = UDim2.new(0.5, -50, 1, -60)
-    button.Text = "确定"
-    button.TextColor3 = Color3.new(1, 1, 1)
-    button.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
-    button.Font = Enum.Font.Legacy
-    button.TextScaled = true
-    button.Parent = dialog
-
-    button.MouseButton1Click:Connect(function()
-        screenGui:Destroy()
-    end)
-
-    task.delay(3, function()
-        pcall(function()
-            game:Shutdown()
-        end)
-    end)
-
-    return -- 阻止执行后续逻辑
-end
-
--- 🟢 合法玩家执行以下传送逻辑
-local tankCrate = workspace["Game Systems"]["Crate Workspace"]["Tank Crate"]
 local originalCFrame = hrp.CFrame
 
-hrp.CFrame = tankCrate.CFrame -- 传送到 Tank Crate
+-- ✅ 查找 Crate Workspace
+local cratesFolder = Workspace:FindFirstChild("Game Systems") and Workspace["Game Systems"]:FindFirstChild("Crate Workspace")
+if not cratesFolder then
+    warn("找不到 Crate Workspace")
+    return
+end
 
-task.delay(3, function()
-    hrp.CFrame = originalCFrame -- 3秒后传回原位
-end)
+-- ✅ 查找最远的 Tank Crate
+local farthestCrate = nil
+local farthestDistance = 0
+
+for _, crate in pairs(cratesFolder:GetChildren()) do
+    if crate.Name == "Tank Crate" and crate:IsA("BasePart") then
+        local distance = (crate.Position - hrp.Position).Magnitude
+        if distance > farthestDistance then
+            farthestDistance = distance
+            farthestCrate = crate
+        end
+    end
+end
+
+-- ✅ 自动交互函数（ProximityPrompt 或 ClickDetector）
+local function autoInteract(part)
+    local prompt = part:FindFirstChildWhichIsA("ProximityPrompt", true)
+    if prompt then
+        fireproximityprompt(prompt)
+        return
+    end
+
+    local click = part:FindFirstChildWhichIsA("ClickDetector", true)
+    if click then
+        fireclickdetector(click)
+        return
+    end
+end
+
+-- ✅ 开始操作
+if farthestCrate then
+    -- 传送过去
+    hrp.CFrame = farthestCrate.CFrame
+
+    -- 立即尝试自动交互
+    autoInteract(farthestCrate)
+
+    -- 3 秒后返回原位置
+    task.delay(3, function()
+        hrp.CFrame = originalCFrame
+    end)
+else
+    warn("未找到 Tank Crate")
+end
