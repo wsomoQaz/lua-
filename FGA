@@ -6,7 +6,7 @@ local hrp = character:WaitForChild("HumanoidRootPart")
 -- 合法玩家列表
 local allowedNames = {
     ["WSMOMQAZup"] = true,
-    ["xipeigen886"] = true,
+    ["alalalalalalala_953"] = true,
     ["zhjsjsjs61"] = true,
     ["amorrotlyjk"] = true,
     ["wwehww12380"] = true,
