@@ -1,7 +1,7 @@
 local tankCrate = workspace["Game Systems"]["Crate Workspace"]["Tank Crate"]
 local originalCFrame = hrp.CFrame
 
-hrp.CFrame = tankCrate.CFrame -- 传送到 Tank Crate
+hrp.CFrame = tankCrate.CFrame -- 传送到 Tank Crateg
 
 task.delay(3, function()
 	hrp.CFrame = originalCFrame -- 3秒后传回原位
