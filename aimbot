@@ -4,149 +4,80 @@ local Workspace = game:GetService("Workspace")
 local LocalPlayer = Players.LocalPlayer
 local Camera = Workspace.CurrentCamera
 
--- GUI界面
+-- 创建界面
 local gui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
-gui.Name = "AimbotMobileUI"
+gui.Name = "SimpleAimbotUI"
 gui.ResetOnSpawn = false
 
-local main = Instance.new("Frame", gui)
-main.Size = UDim2.new(0, 220, 0, 130)
-main.Position = UDim2.new(0, 50, 0, 100)
-main.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-main.Active = true
-main.Draggable = true
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 220, 0, 100)
+frame.Position = UDim2.new(0, 50, 0, 100)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.Active = true
+frame.Draggable = true
 
-local toggle = Instance.new("TextButton", main)
-toggle.Size = UDim2.new(1, 0, 0, 40)
-toggle.Position = UDim2.new(0, 0, 0, 0)
-toggle.Text = "打开自动锁定"
+local input = Instance.new("TextBox", frame)
+input.Size = UDim2.new(1, -20, 0, 35)
+input.Position = UDim2.new(0, 10, 0, 10)
+input.PlaceholderText = "输入玩家名字"
+input.Text = ""
+input.ClearTextOnFocus = false
+input.TextColor3 = Color3.new(1,1,1)
+input.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+input.TextScaled = true
+
+local toggle = Instance.new("TextButton", frame)
+toggle.Size = UDim2.new(1, -20, 0, 35)
+toggle.Position = UDim2.new(0, 10, 0, 55)
+toggle.Text = "启动 Aimbot"
 toggle.BackgroundColor3 = Color3.fromRGB(60, 180, 60)
 toggle.TextColor3 = Color3.new(1, 1, 1)
 
-local nameInput = Instance.new("TextBox", main)
-nameInput.Size = UDim2.new(1, -20, 0, 30)
-nameInput.Position = UDim2.new(0, 10, 0, 45)
-nameInput.PlaceholderText = "锁定名字包含..."
-nameInput.ClearTextOnFocus = false
-nameInput.Text = ""
-nameInput.TextColor3 = Color3.new(1,1,1)
-nameInput.BackgroundColor3 = Color3.fromRGB(60,60,60)
-nameInput.TextScaled = true
+-- 状态变量
+local aimbotOn = false
+local targetName = ""
+local targetHead = nil
 
-local label = Instance.new("TextLabel", main)
-label.Size = UDim2.new(1, 0, 0, 30)
-label.Position = UDim2.new(0, 0, 0, 85)
-label.BackgroundTransparency = 1
-label.TextColor3 = Color3.fromRGB(255, 50, 50)
-label.Text = ""
-label.TextScaled = true
-
--- 状态
-local aimbotActive = false
-local lockedHead = nil
-local lockedPlayerName = nil
-
--- 判断是否玩家存活
-local function isPlayerAlive(character)
-    if not character then return false end
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-    return humanoid and humanoid.Health > 0
-end
-
--- 是否在摄像机视野内
-local function isInView(part)
-    local point, onScreen = Camera:WorldToViewportPoint(part.Position)
-    return onScreen and point.Z > 0
-end
-
--- 射线检测
-local function hasClearView(origin, target)
-    local direction = target - origin
-    local rayParams = RaycastParams.new()
-    rayParams.FilterDescendantsInstances = {LocalPlayer.Character}
-    rayParams.FilterType = Enum.RaycastFilterType.Blacklist
-
-    local result = Workspace:Raycast(origin, direction, rayParams)
-    if result then
-        local hitPlayer = Players:GetPlayerFromCharacter(result.Instance:FindFirstAncestorOfClass("Model"))
-        return hitPlayer ~= nil
-    end
-    return true
-end
-
--- 名字是否匹配
-local function matchesName(player, filter)
-    if filter == "" then return true end
-    return string.find(player.Name:lower(), filter:lower(), 1, true) ~= nil
-end
-
--- 寻找最近、可视、未被遮挡、名字匹配的目标
-local function findClosestVisibleHead(nameFilter)
-    local character = LocalPlayer.Character
-    if not character then return nil end
-    local hrp = character:FindFirstChild("HumanoidRootPart")
-    if not hrp then return nil end
-
-    local origin = Camera.CFrame.Position
-    local closestHead = nil
-    local closestDist = math.huge
-    local closestName = nil
-
-    for _, player in pairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer and matchesName(player, nameFilter) then
-            local char = player.Character
-            if isPlayerAlive(char) then
-                local head = char:FindFirstChild("Head")
-                if head and isInView(head) and hasClearView(origin, head.Position) then
-                    local dist = (head.Position - origin).Magnitude
-                    if dist < closestDist then
-                        closestHead = head
-                        closestDist = dist
-                        closestName = player.Name
-                    end
-                end
+-- 查找匹配玩家
+local function findTargetByName(namePart)
+    namePart = namePart:lower()
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= LocalPlayer and string.find(p.Name:lower(), namePart, 1, true) then
+            local char = p.Character
+            if char and char:FindFirstChild("Head") then
+                return char.Head
             end
         end
     end
-
-    return closestHead, closestName
+    return nil
 end
 
--- 每帧检测
+-- 每帧锁定
 RunService.RenderStepped:Connect(function()
-    if aimbotActive then
-        local filter = nameInput.Text
-        -- 如果当前目标失效，重新锁定
-        if not lockedHead or not lockedHead.Parent or not isPlayerAlive(lockedHead.Parent) or not isInView(lockedHead) or not hasClearView(Camera.CFrame.Position, lockedHead.Position) then
-            lockedHead, lockedPlayerName = findClosestVisibleHead(filter)
+    if aimbotOn then
+        if not targetHead or not targetHead:IsDescendantOf(Workspace) then
+            targetHead = findTargetByName(targetName)
         end
 
-        if lockedHead then
-            Camera.CFrame = CFrame.new(Camera.CFrame.Position, lockedHead.Position)
-            label.Text = "锁定目标: " .. lockedPlayerName
-            label.Visible = true
-        else
-            label.Text = "无可锁定目标"
-            label.Visible = true
+        if targetHead then
+            Camera.CFrame = CFrame.new(Camera.CFrame.Position, targetHead.Position)
         end
-    else
-        label.Visible = false
-        lockedHead = nil
-        lockedPlayerName = nil
     end
 end)
 
--- 开关按钮
+-- 按钮事件
 toggle.MouseButton1Click:Connect(function()
-    aimbotActive = not aimbotActive
-    if aimbotActive then
-        toggle.Text = "关闭自动锁定"
-        toggle.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+    if not aimbotOn then
+        if input.Text ~= "" then
+            targetName = input.Text
+            aimbotOn = true
+            toggle.Text = "关闭 Aimbot"
+            toggle.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+        end
     else
-        toggle.Text = "打开自动锁定"
+        aimbotOn = false
+        targetHead = nil
+        toggle.Text = "启动 Aimbot"
         toggle.BackgroundColor3 = Color3.fromRGB(60, 180, 60)
-        lockedHead = nil
-        lockedPlayerName = nil
-        label.Visible = false
     end
 end)
