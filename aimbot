@@ -1,158 +1,100 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
-local player = Players.LocalPlayer
-local camera = workspace.CurrentCamera
+local Workspace = game:GetService("Workspace")
+local LocalPlayer = Players.LocalPlayer
+local Camera = Workspace.CurrentCamera
+
+-- 创建主界面
+local ScreenGui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
+ScreenGui.Name = "AimbotGui"
+ScreenGui.ResetOnSpawn = false
+
+local Frame = Instance.new("Frame", ScreenGui)
+Frame.Size = UDim2.new(0, 150, 0, 100)
+Frame.Position = UDim2.new(0, 100, 0, 100)
+Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Frame.Active = true
+Frame.Draggable = true
+
+local ToggleButton = Instance.new("TextButton", Frame)
+ToggleButton.Size = UDim2.new(1, 0, 0, 30)
+ToggleButton.Text = "启用Aimbot"
+ToggleButton.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
+ToggleButton.TextColor3 = Color3.new(1, 1, 1)
+
+local FoldButton = Instance.new("TextButton", Frame)
+FoldButton.Size = UDim2.new(1, 0, 0, 25)
+FoldButton.Position = UDim2.new(0, 0, 1, -25)
+FoldButton.Text = "折叠"
+FoldButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+FoldButton.TextColor3 = Color3.new(1, 1, 1)
+
+local NameLabel = Instance.new("TextLabel", ScreenGui)
+NameLabel.Size = UDim2.new(0, 200, 0, 40)
+NameLabel.Position = UDim2.new(0.5, -100, 0.1, 0)
+NameLabel.Text = ""
+NameLabel.BackgroundTransparency = 1
+NameLabel.TextColor3 = Color3.new(1, 0, 0)
+NameLabel.TextScaled = true
+NameLabel.Visible = false
 
 -- 状态变量
 local AimbotEnabled = false
-local LockPart = "Head"
-local FOV = 120
-local lockedTarget = nil
-local dragging, dragStart, startPos
+local LockedTarget = nil
+local Folded = false
 
--- 获取最近目标（含 FOV）
-local function getClosestTarget()
-    local closest, shortest = nil, math.huge
-    local screenCenter = Vector2.new(camera.ViewportSize.X/2, camera.ViewportSize.Y/2)
-
-    for _, target in ipairs(Players:GetPlayers()) do
-        if target ~= player and target.Character then
-            local part = target.Character:FindFirstChild(LockPart)
-            if part then
-                local pos, onScreen = camera:WorldToViewportPoint(part.Position)
-                local dist = (Vector2.new(pos.X, pos.Y) - screenCenter).Magnitude
-                if onScreen and dist < FOV and dist < shortest then
-                    closest = part
-                    shortest = dist
-                end
-            end
-        end
-    end
-    return closest
+-- 查找最近玩家（非自己）
+local function GetClosestTarget()
+	for _, target in pairs(Players:GetPlayers()) do
+		if target ~= LocalPlayer and target.Character and target.Character:FindFirstChild("Head") then
+			local head = target.Character.Head
+			local dist = (Camera.CFrame.Position - head.Position).Magnitude
+			if not LockedTarget or dist < (Camera.CFrame.Position - LockedTarget.Position).Magnitude then
+				LockedTarget = head
+				NameLabel.Text = "锁定：" .. target.Name
+				NameLabel.Visible = true
+			end
+		end
+	end
 end
 
--- 主追踪逻辑（强制锁定模式）
+-- 每帧锁定追踪
 RunService.RenderStepped:Connect(function()
-    if AimbotEnabled then
-        if not lockedTarget or not lockedTarget.Parent then
-            lockedTarget = getClosestTarget()
-        end
-        if lockedTarget and lockedTarget.Parent then
-            local newCFrame = CFrame.new(camera.CFrame.Position, lockedTarget.Position)
-            camera.CFrame = camera.CFrame:Lerp(newCFrame, 0.15)
-        end
-    else
-        lockedTarget = nil
-    end
+	if AimbotEnabled then
+		if not LockedTarget or not LockedTarget:IsDescendantOf(Workspace) then
+			LockedTarget = nil
+			NameLabel.Visible = false
+			GetClosestTarget()
+		end
+		if LockedTarget then
+			local newCFrame = CFrame.new(Camera.CFrame.Position, LockedTarget.Position)
+			Camera.CFrame = newCFrame
+		end
+	end
 end)
 
--- 创建GUI界面
-local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
-gui.Name = "MobileAimbotUI"
-gui.ResetOnSpawn = false
+-- 启用/关闭 Aimbot
+ToggleButton.MouseButton1Click:Connect(function()
+	AimbotEnabled = not AimbotEnabled
+	ToggleButton.Text = AimbotEnabled and "关闭Aimbot" or "启用Aimbot"
+	ToggleButton.BackgroundColor3 = AimbotEnabled and Color3.fromRGB(200, 50, 50) or Color3.fromRGB(50, 200, 50)
 
-local frame = Instance.new("Frame", gui)
-frame.Position = UDim2.new(0.05, 0, 0.2, 0)
-frame.Size = UDim2.new(0, 180, 0, 150)
-frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-frame.BorderSizePixel = 0
-frame.Active = true
-frame.Draggable = false
-
--- 标题栏
-local title = Instance.new("TextLabel", frame)
-title.Size = UDim2.new(1, 0, 0, 30)
-title.Text = "🎯 Aimbot 控制"
-title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-title.TextColor3 = Color3.new(1, 1, 1)
-title.Font = Enum.Font.GothamBold
-title.TextSize = 18
-
--- 拖动支持
-title.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = input.Position
-        startPos = frame.Position
-    end
+	if not AimbotEnabled then
+		LockedTarget = nil
+		NameLabel.Visible = false
+	end
 end)
 
-title.InputChanged:Connect(function(input)
-    if dragging and (input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement) then
-        local delta = input.Position - dragStart
-        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
-
-UserInputService.InputEnded:Connect(function()
-    dragging = false
-end)
-
--- Aimbot 开关按钮
-local toggle = Instance.new("TextButton", frame)
-toggle.Position = UDim2.new(0.05, 0, 0.25, 0)
-toggle.Size = UDim2.new(0.9, 0, 0, 30)
-toggle.Text = "Aimbot: OFF"
-toggle.BackgroundColor3 = Color3.fromRGB(60, 120, 255)
-toggle.TextColor3 = Color3.new(1, 1, 1)
-toggle.Font = Enum.Font.GothamBold
-toggle.TextSize = 16
-
-toggle.MouseButton1Click:Connect(function()
-    AimbotEnabled = not AimbotEnabled
-    toggle.Text = AimbotEnabled and "Aimbot: ON" or "Aimbot: OFF"
-    toggle.BackgroundColor3 = AimbotEnabled and Color3.fromRGB(0, 170, 0) or Color3.fromRGB(60, 120, 255)
-end)
-
--- 锁定部位按钮
-local switch = Instance.new("TextButton", frame)
-switch.Position = UDim2.new(0.05, 0, 0.50, 0)
-switch.Size = UDim2.new(0.9, 0, 0, 30)
-switch.Text = "锁定部位: Head"
-switch.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-switch.TextColor3 = Color3.new(1, 1, 1)
-switch.Font = Enum.Font.Gotham
-switch.TextSize = 16
-
-switch.MouseButton1Click:Connect(function()
-    if LockPart == "Head" then
-        LockPart = "HumanoidRootPart"
-        switch.Text = "锁定部位: 身体"
-    else
-        LockPart = "Head"
-        switch.Text = "锁定部位: Head"
-    end
-end)
-
--- 折叠按钮
-local fold = Instance.new("TextButton", frame)
-fold.Position = UDim2.new(0.05, 0, 0.75, 0)
-fold.Size = UDim2.new(0.9, 0, 0, 30)
-fold.Text = "折叠面板"
-fold.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-fold.TextColor3 = Color3.new(1, 1, 1)
-fold.Font = Enum.Font.Gotham
-fold.TextSize = 15
-
-local isFolded = false
-fold.MouseButton1Click:Connect(function()
-    isFolded = not isFolded
-    if isFolded then
-        for _, child in ipairs(frame:GetChildren()) do
-            if child:IsA("TextButton") and child ~= fold then
-                child.Visible = false
-            end
-        end
-        fold.Text = "展开面板"
-        frame.Size = UDim2.new(0, 180, 0, 60)
-    else
-        for _, child in ipairs(frame:GetChildren()) do
-            if child:IsA("TextButton") then
-                child.Visible = true
-            end
-        end
-        fold.Text = "折叠面板"
-        frame.Size = UDim2.new(0, 180, 0, 150)
-    end
+-- 折叠功能
+FoldButton.MouseButton1Click:Connect(function()
+	Folded = not Folded
+	if Folded then
+		ToggleButton.Visible = false
+		FoldButton.Text = "展开"
+		Frame.Size = UDim2.new(0, 150, 0, 25)
+	else
+		ToggleButton.Visible = true
+		FoldButton.Text = "折叠"
+		Frame.Size = UDim2.new(0, 150, 0, 100)
+	end
 end)
