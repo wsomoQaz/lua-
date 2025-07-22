@@ -2,21 +2,15 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
-local playerGui = LocalPlayer:WaitForChild("PlayerGui")
+local Workspace = game:GetService("Workspace")
 
--- 防止重复创建
-for _, name in pairs({"AimbotMobileUI", "AimbotInfoUI", "AimbotHeadSizeUI"}) do
-    local existing = playerGui:FindFirstChild(name)
-    if existing then existing:Destroy() end
-end
-
--- == 第一个GUI (Aimbot控制) ==
-local gui = Instance.new("ScreenGui", playerGui)
+-- 创建GUI（和你原来的一样，简单点就行）
+local gui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
 gui.Name = "AimbotMobileUI"
 gui.ResetOnSpawn = false
 
 local main = Instance.new("Frame", gui)
-main.Size = UDim2.new(0, 220, 0, 180)
+main.Size = UDim2.new(0, 220, 0, 90)
 main.Position = UDim2.new(0, 50, 0, 100)
 main.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 main.Active = true
@@ -25,201 +19,98 @@ main.Draggable = true
 local toggle = Instance.new("TextButton", main)
 toggle.Size = UDim2.new(1, 0, 0, 40)
 toggle.Position = UDim2.new(0, 0, 0, 0)
-toggle.Text = "打开Aimbot"
+toggle.Text = "打开自动瞄准"
 toggle.BackgroundColor3 = Color3.fromRGB(60, 180, 60)
 toggle.TextColor3 = Color3.new(1, 1, 1)
 
-local fold = Instance.new("TextButton", main)
-fold.Size = UDim2.new(1, 0, 0, 25)
-fold.Position = UDim2.new(0, 0, 1, -25)
-fold.Text = "折叠"
-fold.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-fold.TextColor3 = Color3.new(1, 1, 1)
-
-local nameInput = Instance.new("TextBox", main)
-nameInput.Size = UDim2.new(1, -20, 0, 30)
-nameInput.Position = UDim2.new(0, 10, 0, 50)
-nameInput.PlaceholderText = "输入玩家名字部分匹配"
-nameInput.ClearTextOnFocus = false
-nameInput.Text = ""
-nameInput.TextColor3 = Color3.new(1,1,1)
-nameInput.BackgroundColor3 = Color3.fromRGB(60,60,60)
-nameInput.TextScaled = true
-
-local label = Instance.new("TextLabel", gui)
-label.Size = UDim2.new(0, 250, 0, 40)
-label.Position = UDim2.new(0.5, -125, 0.1, 0)
+local label = Instance.new("TextLabel", main)
+label.Size = UDim2.new(1, 0, 0, 40)
+label.Position = UDim2.new(0, 0, 0, 45)
 label.BackgroundTransparency = 1
 label.TextColor3 = Color3.fromRGB(255, 50, 50)
 label.Text = ""
 label.TextScaled = true
-label.Visible = false
 
--- Aimbot 状态
 local aimbotActive = false
-local lockedHead = nil
-local lockedName = nil
 
-local function findPlayerByNamePart(namePart)
-    local lowerNamePart = namePart:lower()
-    for _, p in pairs(Players:GetPlayers()) do
-        local lowerPlayerName = p.Name:lower()
-        if string.find(lowerPlayerName, lowerNamePart, 1, true) then
-            if p.Character and p.Character:FindFirstChild("Head") then
-                return p.Character.Head, p.Name
+-- 射线检测函数，判断视线是否被阻挡
+local function canSeeTarget(originPos, targetPos)
+    local direction = (targetPos - originPos)
+    local raycastParams = RaycastParams.new()
+    raycastParams.FilterDescendantsInstances = {LocalPlayer.Character}
+    raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+    local raycastResult = Workspace:Raycast(originPos, direction, raycastParams)
+    if raycastResult then
+        local hitPart = raycastResult.Instance
+        if hitPart and hitPart:IsDescendantOf(LocalPlayer.Character) then
+            -- 射线击中自己，视线通畅
+            return true
+        end
+        -- 如果射线击中目标头部附近的物体，说明被阻挡了
+        return false
+    else
+        -- 没有击中任何东西，视线通畅
+        return true
+    end
+end
+
+-- 寻找最近且无阻挡的玩家头部
+local function findClosestVisibleHead()
+    local character = LocalPlayer.Character
+    if not character then return nil end
+    local hrp = character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return nil end
+
+    local origin = hrp.Position
+    local closestHead = nil
+    local closestDistance = math.huge
+    local closestPlayerName = nil
+
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            local char = player.Character
+            if char then
+                local head = char:FindFirstChild("Head")
+                local humanoid = char:FindFirstChildOfClass("Humanoid")
+                if head and humanoid and humanoid.Health > 0 then
+                    local dist = (head.Position - origin).Magnitude
+                    if dist < closestDistance and canSeeTarget(origin, head.Position) then
+                        closestHead = head
+                        closestDistance = dist
+                        closestPlayerName = player.Name
+                    end
+                end
             end
         end
     end
-    return nil, nil
+
+    return closestHead, closestPlayerName
 end
 
 RunService.RenderStepped:Connect(function()
-    if aimbotActive and lockedHead and lockedHead.Parent then
-        Camera.CFrame = CFrame.new(Camera.CFrame.Position, lockedHead.Position)
-        label.Text = "锁定目标：" .. (lockedName or "???")
-        label.Visible = true
-    else
-        if aimbotActive and lockedName then
-            local head, pname = findPlayerByNamePart(lockedName)
-            if head then
-                lockedHead = head
-                lockedName = pname
-                label.Text = "锁定目标：" .. pname
-                label.Visible = true
-            else
-                lockedHead = nil
-                label.Text = "找不到玩家: " .. lockedName
-                label.Visible = true
-            end
+    if aimbotActive then
+        local head, pname = findClosestVisibleHead()
+        if head then
+            Camera.CFrame = CFrame.new(Camera.CFrame.Position, head.Position)
+            label.Text = "锁定目标: " .. pname
+            label.Visible = true
         else
-            label.Visible = false
+            label.Text = "未找到可视目标"
+            label.Visible = true
         end
+    else
+        label.Visible = false
     end
 end)
 
 toggle.MouseButton1Click:Connect(function()
-    if not aimbotActive then
-        local inputName = nameInput.Text
-        if inputName ~= "" then
-            local head, pname = findPlayerByNamePart(inputName)
-            if head then
-                lockedHead = head
-                lockedName = pname
-            else
-                lockedHead = nil
-                lockedName = inputName
-            end
-        else
-            lockedHead = nil
-            lockedName = nil
-        end
-        aimbotActive = true
-        toggle.Text = "关闭Aimbot"
+    aimbotActive = not aimbotActive
+    if aimbotActive then
+        toggle.Text = "关闭自动瞄准"
         toggle.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
     else
-        aimbotActive = false
-        lockedHead = nil
-        lockedName = nil
-        toggle.Text = "打开Aimbot"
+        toggle.Text = "打开自动瞄准"
         toggle.BackgroundColor3 = Color3.fromRGB(60, 180, 60)
+        label.Visible = false
     end
 end)
-
-fold.MouseButton1Click:Connect(function()
-    if main.Size.Y.Offset > 50 then
-        main.Size = UDim2.new(0, 220, 0, 50)
-        fold.Text = "展开"
-        nameInput.Visible = false
-        toggle.Visible = false
-    else
-        main.Size = UDim2.new(0, 220, 0, 180)
-        fold.Text = "折叠"
-        nameInput.Visible = true
-        toggle.Visible = true
-    end
-end)
-
-
--- == 第二个 GUI (简单信息窗，示例用) ==
-local gui2 = Instance.new("ScreenGui", playerGui)
-gui2.Name = "AimbotInfoUI"
-gui2.ResetOnSpawn = false
-
-local frame2 = Instance.new("Frame", gui2)
-frame2.Size = UDim2.new(0, 180, 0, 60)
-frame2.Position = UDim2.new(0, 300, 0, 100)
-frame2.BackgroundColor3 = Color3.fromRGB(20, 20, 70)
-frame2.Active = true
-frame2.Draggable = true
-
-local label2 = Instance.new("TextLabel", frame2)
-label2.Size = UDim2.new(1, 0, 1, 0)
-label2.BackgroundTransparency = 1
-label2.TextColor3 = Color3.new(1, 1, 1)
-label2.TextScaled = true
-label2.Text = "这是第二个独立窗口"
-
-
--- == 第三个 GUI (控制所有玩家头部大小) ==
-local gui3 = Instance.new("ScreenGui", playerGui)
-gui3.Name = "AimbotHeadSizeUI"
-gui3.ResetOnSpawn = false
-
-local frame3 = Instance.new("Frame", gui3)
-frame3.Size = UDim2.new(0, 180, 0, 100)
-frame3.Position = UDim2.new(0, 50, 0, 300)
-frame3.BackgroundColor3 = Color3.fromRGB(50, 50, 20)
-frame3.Active = true
-frame3.Draggable = true
-
-local headSizeLabel = Instance.new("TextLabel", frame3)
-headSizeLabel.Size = UDim2.new(1, 0, 0, 30)
-headSizeLabel.Position = UDim2.new(0, 0, 0, 0)
-headSizeLabel.BackgroundTransparency = 1
-headSizeLabel.TextColor3 = Color3.new(1, 1, 1)
-headSizeLabel.TextScaled = true
-headSizeLabel.Text = "玩家头大小调整: 1"
-
-local plusButton = Instance.new("TextButton", frame3)
-plusButton.Size = UDim2.new(0.45, -5, 0, 40)
-plusButton.Position = UDim2.new(0, 5, 0, 40)
-plusButton.Text = "+1"
-plusButton.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
-plusButton.TextColor3 = Color3.new(1,1,1)
-
-local minusButton = Instance.new("TextButton", frame3)
-minusButton.Size = UDim2.new(0.45, -5, 0, 40)
-minusButton.Position = UDim2.new(0.55, 0, 0, 40)
-minusButton.Text = "-1"
-minusButton.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
-minusButton.TextColor3 = Color3.new(1,1,1)
-
-local currentScale = 1
-
-local function updateAllHeads(scale)
-    for _, p in pairs(Players:GetPlayers()) do
-        if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("Head") then
-            local head = p.Character.Head
-            -- 保护旧的大小，防止不断叠加，先还原初始大小(这里默认1)
-            -- 你如果想做更复杂的保存机制，可以改
-            head.Size = Vector3.new(2, 1, 1) * scale -- Roblox默认头部大小大约是 Vector3.new(2,1,1)
-        end
-    end
-end
-
-plusButton.MouseButton1Click:Connect(function()
-    currentScale = currentScale + 1
-    if currentScale > 10 then currentScale = 10 end -- 最大10倍
-    headSizeLabel.Text = "玩家头大小调整: " .. currentScale
-    updateAllHeads(currentScale)
-end)
-
-minusButton.MouseButton1Click:Connect(function()
-    currentScale = currentScale - 1
-    if currentScale < 1 then currentScale = 1 end -- 最小1倍（原始大小）
-    headSizeLabel.Text = "玩家头大小调整: " .. currentScale
-    updateAllHeads(currentScale)
-end)
-
--- 初始化一次
-updateAllHeads(currentScale)
