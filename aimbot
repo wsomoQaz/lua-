@@ -8,9 +8,10 @@ local camera = workspace.CurrentCamera
 local AimbotEnabled = false
 local LockPart = "Head"
 local FOV = 120
+local lockedTarget = nil
 local dragging, dragStart, startPos
 
--- 获取最近目标
+-- 获取最近目标（含 FOV）
 local function getClosestTarget()
     local closest, shortest = nil, math.huge
     local screenCenter = Vector2.new(camera.ViewportSize.X/2, camera.ViewportSize.Y/2)
@@ -31,14 +32,18 @@ local function getClosestTarget()
     return closest
 end
 
--- 自动锁定逻辑
+-- 主追踪逻辑（强制锁定模式）
 RunService.RenderStepped:Connect(function()
     if AimbotEnabled then
-        local target = getClosestTarget()
-        if target then
-            local newCFrame = CFrame.new(camera.CFrame.Position, target.Position)
+        if not lockedTarget or not lockedTarget.Parent then
+            lockedTarget = getClosestTarget()
+        end
+        if lockedTarget and lockedTarget.Parent then
+            local newCFrame = CFrame.new(camera.CFrame.Position, lockedTarget.Position)
             camera.CFrame = camera.CFrame:Lerp(newCFrame, 0.15)
         end
+    else
+        lockedTarget = nil
     end
 end)
 
@@ -53,7 +58,7 @@ frame.Size = UDim2.new(0, 180, 0, 150)
 frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 frame.BorderSizePixel = 0
 frame.Active = true
-frame.Draggable = false -- 手动拖动适配Touch
+frame.Draggable = false
 
 -- 标题栏
 local title = Instance.new("TextLabel", frame)
@@ -80,13 +85,11 @@ title.InputChanged:Connect(function(input)
     end
 end)
 
-UserInputService.InputEnded:Connect(function(input)
-    if dragging then
-        dragging = false
-    end
+UserInputService.InputEnded:Connect(function()
+    dragging = false
 end)
 
--- Aimbot开关按钮
+-- Aimbot 开关按钮
 local toggle = Instance.new("TextButton", frame)
 toggle.Position = UDim2.new(0.05, 0, 0.25, 0)
 toggle.Size = UDim2.new(0.9, 0, 0, 30)
