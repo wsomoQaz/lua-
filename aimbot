@@ -3,13 +3,13 @@ local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
 
--- GUI初始化
+-- 创建GUI
 local gui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
 gui.Name = "AimbotMobileUI"
 gui.ResetOnSpawn = false
 
 local main = Instance.new("Frame", gui)
-main.Size = UDim2.new(0, 160, 0, 100)
+main.Size = UDim2.new(0, 220, 0, 180)
 main.Position = UDim2.new(0, 50, 0, 100)
 main.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 main.Active = true
@@ -29,6 +29,16 @@ fold.Text = "折叠"
 fold.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
 fold.TextColor3 = Color3.new(1, 1, 1)
 
+local nameInput = Instance.new("TextBox", main)
+nameInput.Size = UDim2.new(1, -20, 0, 30)
+nameInput.Position = UDim2.new(0, 10, 0, 50)
+nameInput.PlaceholderText = "输入玩家名字部分匹配"
+nameInput.ClearTextOnFocus = false
+nameInput.Text = ""
+nameInput.TextColor3 = Color3.new(1,1,1)
+nameInput.BackgroundColor3 = Color3.fromRGB(60,60,60)
+nameInput.TextScaled = true
+
 local label = Instance.new("TextLabel", gui)
 label.Size = UDim2.new(0, 250, 0, 40)
 label.Position = UDim2.new(0.5, -125, 0.1, 0)
@@ -38,62 +48,86 @@ label.Text = ""
 label.TextScaled = true
 label.Visible = false
 
--- 状态控制
+-- 状态
 local aimbotActive = false
 local lockedHead = nil
+local lockedName = nil
 
--- 获取最近玩家头部
-local function GetNearestHead()
-	local closestHead = nil
-	local shortestDist = math.huge
-
-	for _, target in pairs(Players:GetPlayers()) do
-		if target ~= LocalPlayer and target.Character and target.Character:FindFirstChild("Head") then
-			local head = target.Character.Head
-			local dist = (Camera.CFrame.Position - head.Position).Magnitude
-			if dist < shortestDist then
-				shortestDist = dist
-				closestHead = head
-			end
-		end
-	end
-	return closestHead
+local function findPlayerByNamePart(namePart)
+    local lowerNamePart = namePart:lower()
+    for _, p in pairs(Players:GetPlayers()) do
+        local lowerPlayerName = p.Name:lower()
+        if string.find(lowerPlayerName, lowerNamePart, 1, true) then
+            if p.Character and p.Character:FindFirstChild("Head") then
+                return p.Character.Head, p.Name
+            end
+        end
+    end
+    return nil, nil
 end
 
--- 每帧强制瞄准
 RunService.RenderStepped:Connect(function()
-	if aimbotActive then
-		if not lockedHead or not lockedHead:IsDescendantOf(workspace) then
-			lockedHead = GetNearestHead()
-		end
-
-		if lockedHead then
-			Camera.CFrame = CFrame.new(Camera.CFrame.Position, lockedHead.Position)
-			local playerName = lockedHead.Parent and lockedHead.Parent.Name or "???"
-			label.Text = "锁定目标：" .. playerName
-			label.Visible = true
-		else
-			label.Visible = false
-		end
-	end
+    if aimbotActive and lockedHead and lockedHead.Parent then
+        Camera.CFrame = CFrame.new(Camera.CFrame.Position, lockedHead.Position)
+        label.Text = "锁定目标：" .. (lockedName or "???")
+        label.Visible = true
+    else
+        if aimbotActive and lockedName then
+            local head, pname = findPlayerByNamePart(lockedName)
+            if head then
+                lockedHead = head
+                lockedName = pname
+                label.Text = "锁定目标：" .. pname
+                label.Visible = true
+            else
+                lockedHead = nil
+                label.Text = "找不到玩家: " .. lockedName
+                label.Visible = true
+            end
+        else
+            label.Visible = false
+        end
+    end
 end)
 
--- 切换开关
 toggle.MouseButton1Click:Connect(function()
-	aimbotActive = not aimbotActive
-	toggle.Text = aimbotActive and "关闭Aimbot" or "打开Aimbot"
-	toggle.BackgroundColor3 = aimbotActive and Color3.fromRGB(200, 50, 50) or Color3.fromRGB(60, 180, 60)
-	if not aimbotActive then
-		label.Visible = false
-		lockedHead = nil
-	end
+    if not aimbotActive then
+        local inputName = nameInput.Text
+        if inputName ~= "" then
+            local head, pname = findPlayerByNamePart(inputName)
+            if head then
+                lockedHead = head
+                lockedName = pname
+            else
+                lockedHead = nil
+                lockedName = inputName
+            end
+        else
+            lockedHead = nil
+            lockedName = nil
+        end
+        aimbotActive = true
+        toggle.Text = "关闭Aimbot"
+        toggle.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+    else
+        aimbotActive = false
+        lockedHead = nil
+        lockedName = nil
+        toggle.Text = "打开Aimbot"
+        toggle.BackgroundColor3 = Color3.fromRGB(60, 180, 60)
+    end
 end)
 
--- 折叠按钮
-local isFolded = false
 fold.MouseButton1Click:Connect(function()
-	isFolded = not isFolded
-	toggle.Visible = not isFolded
-	fold.Text = isFolded and "展开" or "折叠"
-	main.Size = isFolded and UDim2.new(0, 160, 0, 25) or UDim2.new(0, 160, 0, 100)
+    if main.Size.Y.Offset > 50 then
+        main.Size = UDim2.new(0, 220, 0, 50)
+        fold.Text = "展开"
+        nameInput.Visible = false
+        toggle.Visible = false
+    else
+        main.Size = UDim2.new(0, 220, 0, 180)
+        fold.Text = "折叠"
+        nameInput.Visible = true
+        toggle.Visible = true
+    end
 end)
