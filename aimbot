@@ -2,9 +2,16 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
+local playerGui = LocalPlayer:WaitForChild("PlayerGui")
 
--- 创建GUI
-local gui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
+-- 防止重复创建
+for _, name in pairs({"AimbotMobileUI", "AimbotInfoUI", "AimbotHeadSizeUI"}) do
+    local existing = playerGui:FindFirstChild(name)
+    if existing then existing:Destroy() end
+end
+
+-- == 第一个GUI (Aimbot控制) ==
+local gui = Instance.new("ScreenGui", playerGui)
 gui.Name = "AimbotMobileUI"
 gui.ResetOnSpawn = false
 
@@ -48,7 +55,7 @@ label.Text = ""
 label.TextScaled = true
 label.Visible = false
 
--- 状态
+-- Aimbot 状态
 local aimbotActive = false
 local lockedHead = nil
 local lockedName = nil
@@ -131,3 +138,88 @@ fold.MouseButton1Click:Connect(function()
         toggle.Visible = true
     end
 end)
+
+
+-- == 第二个 GUI (简单信息窗，示例用) ==
+local gui2 = Instance.new("ScreenGui", playerGui)
+gui2.Name = "AimbotInfoUI"
+gui2.ResetOnSpawn = false
+
+local frame2 = Instance.new("Frame", gui2)
+frame2.Size = UDim2.new(0, 180, 0, 60)
+frame2.Position = UDim2.new(0, 300, 0, 100)
+frame2.BackgroundColor3 = Color3.fromRGB(20, 20, 70)
+frame2.Active = true
+frame2.Draggable = true
+
+local label2 = Instance.new("TextLabel", frame2)
+label2.Size = UDim2.new(1, 0, 1, 0)
+label2.BackgroundTransparency = 1
+label2.TextColor3 = Color3.new(1, 1, 1)
+label2.TextScaled = true
+label2.Text = "这是第二个独立窗口"
+
+
+-- == 第三个 GUI (控制所有玩家头部大小) ==
+local gui3 = Instance.new("ScreenGui", playerGui)
+gui3.Name = "AimbotHeadSizeUI"
+gui3.ResetOnSpawn = false
+
+local frame3 = Instance.new("Frame", gui3)
+frame3.Size = UDim2.new(0, 180, 0, 100)
+frame3.Position = UDim2.new(0, 50, 0, 300)
+frame3.BackgroundColor3 = Color3.fromRGB(50, 50, 20)
+frame3.Active = true
+frame3.Draggable = true
+
+local headSizeLabel = Instance.new("TextLabel", frame3)
+headSizeLabel.Size = UDim2.new(1, 0, 0, 30)
+headSizeLabel.Position = UDim2.new(0, 0, 0, 0)
+headSizeLabel.BackgroundTransparency = 1
+headSizeLabel.TextColor3 = Color3.new(1, 1, 1)
+headSizeLabel.TextScaled = true
+headSizeLabel.Text = "玩家头大小调整: 1"
+
+local plusButton = Instance.new("TextButton", frame3)
+plusButton.Size = UDim2.new(0.45, -5, 0, 40)
+plusButton.Position = UDim2.new(0, 5, 0, 40)
+plusButton.Text = "+1"
+plusButton.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+plusButton.TextColor3 = Color3.new(1,1,1)
+
+local minusButton = Instance.new("TextButton", frame3)
+minusButton.Size = UDim2.new(0.45, -5, 0, 40)
+minusButton.Position = UDim2.new(0.55, 0, 0, 40)
+minusButton.Text = "-1"
+minusButton.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
+minusButton.TextColor3 = Color3.new(1,1,1)
+
+local currentScale = 1
+
+local function updateAllHeads(scale)
+    for _, p in pairs(Players:GetPlayers()) do
+        if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("Head") then
+            local head = p.Character.Head
+            -- 保护旧的大小，防止不断叠加，先还原初始大小(这里默认1)
+            -- 你如果想做更复杂的保存机制，可以改
+            head.Size = Vector3.new(2, 1, 1) * scale -- Roblox默认头部大小大约是 Vector3.new(2,1,1)
+        end
+    end
+end
+
+plusButton.MouseButton1Click:Connect(function()
+    currentScale = currentScale + 1
+    if currentScale > 10 then currentScale = 10 end -- 最大10倍
+    headSizeLabel.Text = "玩家头大小调整: " .. currentScale
+    updateAllHeads(currentScale)
+end)
+
+minusButton.MouseButton1Click:Connect(function()
+    currentScale = currentScale - 1
+    if currentScale < 1 then currentScale = 1 end -- 最小1倍（原始大小）
+    headSizeLabel.Text = "玩家头大小调整: " .. currentScale
+    updateAllHeads(currentScale)
+end)
+
+-- 初始化一次
+updateAllHeads(currentScale)
