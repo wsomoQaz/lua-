@@ -167,4 +167,10 @@ Tab:AddDropdown({
     end
 })
 
-
+Tab:AddToggle({
+    Name = "开关名称",
+    Default = false,
+    Callback = function(Value)
+        -- Value 为 true 或 false
+    end
+})
