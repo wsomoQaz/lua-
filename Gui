@@ -16,5 +16,80 @@ local Tab = Window:MakeTab({
     PremiumOnly = false
 })
 
+Tab:AddButton({
+    Name = "50",
+    Callback = function()
+        -- 服务引用
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
 
- 
+-- GUI 构建
+local ScreenGui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
+ScreenGui.Name = "AutoHitBoxGui"
+ScreenGui.ResetOnSpawn = false
+
+local Frame = Instance.new("Frame", ScreenGui)
+Frame.Size = UDim2.new(0, 200, 0, 100)
+Frame.Position = UDim2.new(0.5, -100, 0.5, -50)
+Frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+Frame.Active = true
+Frame.Draggable = true
+Frame.Name = "MainFrame"
+
+local ToggleBtn = Instance.new("TextButton", Frame)
+ToggleBtn.Size = UDim2.new(1, -20, 0, 30)
+ToggleBtn.Position = UDim2.new(0, 10, 0, 10)
+ToggleBtn.Text = "启动自动攻击"
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(60, 180, 75)
+ToggleBtn.TextColor3 = Color3.new(1,1,1)
+
+local FoldBtn = Instance.new("TextButton", Frame)
+FoldBtn.Size = UDim2.new(1, -20, 0, 25)
+FoldBtn.Position = UDim2.new(0, 10, 1, -35)
+FoldBtn.Text = "折叠面板"
+FoldBtn.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+FoldBtn.TextColor3 = Color3.new(1,1,1)
+
+-- 折叠状态
+local folded = false
+FoldBtn.MouseButton1Click:Connect(function()
+	folded = not folded
+	Frame.Size = folded and UDim2.new(0, 200, 0, 40) or UDim2.new(0, 200, 0, 100)
+	FoldBtn.Text = folded and "展开面板" or "折叠面板"
+end)
+
+-- 自动攻击逻辑
+local enabled = false
+ToggleBtn.MouseButton1Click:Connect(function()
+	enabled = not enabled
+	ToggleBtn.Text = enabled and "停止自动攻击" or "启动自动攻击"
+	ToggleBtn.BackgroundColor3 = enabled and Color3.fromRGB(200, 50, 50) or Color3.fromRGB(60, 180, 75)
+end)
+
+-- 执行参数
+local args = {
+	13,
+	"Standard",
+	false,
+	"Silver Pickaxe",
+	0.85
+}
+
+-- 主循环：每秒50次
+spawn(function()
+	while true do
+		if enabled then
+			for i = 1, 50 do
+				-- 安全执行一次调用
+				pcall(function()
+					ReplicatedStorage:WaitForChild("RemoteEvent"):WaitForChild("HitBox"):FireServer(unpack(args))
+				end)
+			end
+		end
+		wait(1)
+	end
+end)
+    end
+}) 
