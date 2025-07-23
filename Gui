@@ -216,6 +216,6 @@ teleportButton.MouseButton1Click:Connect(function()
 		currentTarget = nil
 		teleportButton.Text = "开始自动追踪矿石"
 	end
-end)[""] = true,
+end)
     end
 })
