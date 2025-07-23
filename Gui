@@ -81,18 +81,7 @@ Tab:AddButton({
 	end
 })
 
-Tab:AddButton({
-	Name = "传送到 (52.97, 14.65, 16.85)",
-	Callback = function()
-		local Players = game:GetService("Players")
-		local LocalPlayer = Players.LocalPlayer
-		local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-		local HRP = Character:WaitForChild("HumanoidRootPart")
-		
-		local targetPosition = Vector3.new(52.97, 14.65, 16.85)
-		HRP.CFrame = CFrame.new(targetPosition)
-	end
-})
+
 
 Tab:AddButton({
 	Name = "逆向森林商店",
@@ -107,18 +96,7 @@ Tab:AddButton({
 	end
 })
 
-Tab:AddButton({
-	Name = "传送到 (52.97, 14.65, 16.85)",
-	Callback = function()
-		local Players = game:GetService("Players")
-		local LocalPlayer = Players.LocalPlayer
-		local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-		local HRP = Character:WaitForChild("HumanoidRootPart")
-		
-		local targetPosition = Vector3.new(52.97, 14.65, 16.85)
-		HRP.CFrame = CFrame.new(targetPosition)
-	end
-})
+
 
 Tab:AddButton({
 	Name = "逆向森林第二层",
@@ -180,23 +158,4 @@ local Tab = Window:MakeTab({
     PremiumOnly = false
 })
 
-Tab:AddToggle({
-	Name = "自动功能开关",     -- 显示在界面的文字
-	Default = false,         -- 初始是否勾选
-	Save = false,            -- 是否保存配置
-	Callback = function(Value) -- 勾选状态改变时触发
-		if Value then
-			print("已开启")
-			-- 你要执行的开启逻辑放这里
-		else
-			print("已关闭")
-			-- 你要执行的关闭逻辑放这里
-		end
-	end    
-})
 
-OrionLib:MakeNotification({
-    Name = "已开启",
-    Content = "功能已打开 ✔️",
-    Time = 2
-})
