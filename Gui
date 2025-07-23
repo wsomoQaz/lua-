@@ -17,31 +17,4 @@ local Tab = Window:MakeTab({
 })
 
 
-Tab:AddToggle({
-    Name = "开关名称",
-    Default = false,
-    Callback = function(Value)
-        -- 服务引用
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
--- 要发送的参数
-local args = {
-    13,
-    "Standard",
-    false,
-    "Silver Pickaxe",
-    0.85
-}
-
--- 自动攻击线程（每秒执行50次）
-while true do
-    for i = 1, 50 do
-        -- 安全执行一次调用
-        pcall(function()
-            ReplicatedStorage:WaitForChild("RemoteEvent"):WaitForChild("HitBox"):FireServer(unpack(args))
-        end)
-    end
-    wait(1) -- 每秒执行一次循环
-end
-    end
-})
+ 
