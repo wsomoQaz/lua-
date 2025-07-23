@@ -171,3 +171,11 @@ Tab:AddButton({
 		HRP.CFrame = CFrame.new(targetPosition)
 	end
 })
+
+
+-- 创建一个功能 Tab
+local Tab = Window:MakeTab({
+    Name = "地点",
+    Icon = "rbxassetid://7733779610", -- 图标素材ID
+    PremiumOnly = false
+})
