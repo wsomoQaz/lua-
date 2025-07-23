@@ -158,4 +158,13 @@ local Tab = Window:MakeTab({
     PremiumOnly = false
 })
 
+Tab:AddDropdown({
+    Name = "下拉菜单名称",
+    Default = "选项1",
+    Options = {"选项1", "选项2", "选项3"},
+    Callback = function(selected)
+        -- selected 为选择的内容
+    end
+})
+
 
