@@ -55,41 +55,41 @@ FoldBtn.TextColor3 = Color3.new(1,1,1)
 -- 折叠状态
 local folded = false
 FoldBtn.MouseButton1Click:Connect(function()
-	folded = not folded
-	Frame.Size = folded and UDim2.new(0, 200, 0, 40) or UDim2.new(0, 200, 0, 100)
-	FoldBtn.Text = folded and "展开面板" or "折叠面板"
+        folded = not folded
+        Frame.Size = folded and UDim2.new(0, 200, 0, 40) or UDim2.new(0, 200, 0, 100)
+        FoldBtn.Text = folded and "展开面板" or "折叠面板"
 end)
 
 -- 自动攻击逻辑
 local enabled = false
 ToggleBtn.MouseButton1Click:Connect(function()
-	enabled = not enabled
-	ToggleBtn.Text = enabled and "停止自动攻击" or "启动自动攻击"
-	ToggleBtn.BackgroundColor3 = enabled and Color3.fromRGB(200, 50, 50) or Color3.fromRGB(60, 180, 75)
+        enabled = not enabled
+        ToggleBtn.Text = enabled and "停止自动攻击" or "启动自动攻击"
+        ToggleBtn.BackgroundColor3 = enabled and Color3.fromRGB(200, 50, 50) or Color3.fromRGB(60, 180, 75)
 end)
 
 -- 执行参数
 local args = {
-	13,
-	"Standard",
-	false,
-	"Silver Pickaxe",
-	0.85
+        13,
+        "Standard",
+        false,
+        "Silver Pickaxe",
+        0.85
 }
 
 -- 主循环：每秒50次
 spawn(function()
-	while true do
-		if enabled then
-			for i = 1, 50 do
-				-- 安全执行一次调用
-				pcall(function()
-					ReplicatedStorage:WaitForChild("RemoteEvent"):WaitForChild("HitBox"):FireServer(unpack(args))
-				end)
-			end
-		end
-		wait(1)
-	end
+        while true do
+                if enabled then
+                        for i = 1, 50 do
+                                -- 安全执行一次调用
+                                pcall(function()
+                                        ReplicatedStorage:WaitForChild("RemoteEvent"):WaitForChild("HitBox"):FireServer(unpack(args))
+                                end)
+                        end
+                end
+                wait(1)
+        end
 end)
     end
 }) 
@@ -109,5 +109,4 @@ local targetPosition = Vector3.new(52.97, 14.65, 16.85)
 HRP.CFrame = CFrame.new(targetPosition)
     end
 })
-
 
