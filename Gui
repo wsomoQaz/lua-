@@ -11,7 +11,7 @@ local Window = OrionLib:MakeWindow({
 
 -- 创建一个功能 Tab
 local Tab = Window:MakeTab({
-    Name = "功能",
+    Name = "地点",
     Icon = "rbxassetid://7733779610", -- 图标素材ID
     PremiumOnly = false
 })
