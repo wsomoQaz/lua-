@@ -95,14 +95,17 @@ end)
 }) 
 
 Tab:AddButton({
-	Name = "传送到 (52.97, 14.65, 16.85)",
-	Callback = function()
-		local Players = game:GetService("Players")
-		local LocalPlayer = Players.LocalPlayer
-		local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-		local HRP = Character:WaitForChild("HumanoidRootPart")
-		
-		local targetPosition = Vector3.new(52.97, 14.65, 16.85)
-		HRP.CFrame = CFrame.new(targetPosition)
-	end
+    Name = "售卖东西的地方",
+    Callback = function()
+        local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HRP = Character:WaitForChild("HumanoidRootPart")
+
+-- 指定目标坐标
+local targetPosition = Vector3.new(52.97, 14.65, 16.85)
+
+-- 执行传送
+HRP.CFrame = CFrame.new(targetPosition)
+    end
 })
