@@ -110,18 +110,21 @@ HRP.CFrame = CFrame.new(targetPosition)
     end
 })
 
-Tab:AddButton({
-    Name = "水晶洞",
-    Callback = function()
-        local Players = game:GetService("Players")
+
+local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
-local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-local HRP = Character:WaitForChild("HumanoidRootPart")
 
--- 指定目标坐标
-local targetPosition = Vector3.new(469.26, -369.15, 169.33)
+-- OrionLib UI 中添加按钮
+Tab:AddButton({
+    Name = "传送到目标位置",
+    Callback = function()
+        local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+        local HRP = Character:WaitForChild("HumanoidRootPart")
 
--- 执行传送
-HRP.CFrame = CFrame.new(targetPosition)
+        -- 目标坐标（使用你最新提供的坐标）
+        local targetPosition = Vector3.new(469.26, -369.15, 169.33)
+
+        -- 执行传送
+        HRP.CFrame = CFrame.new(targetPosition)
     end
-}
+})
