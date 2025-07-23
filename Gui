@@ -16,3 +16,42 @@ local Tab = Window:MakeTab({
     PremiumOnly = false
 })
 
+-- 自动攻击参数
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local args = {
+    13,
+    "Standard",
+    false,
+    "Silver Pickaxe",
+    0.85
+}
+
+-- 攻击状态
+local attacking = false
+
+-- 添加 Toggle 开关
+Tab:AddToggle({
+	Name = "自动攻击开关",
+	Default = false,
+	Callback = function(Value)
+		attacking = Value
+	end
+})
+
+-- 循环执行：每秒执行 50 次
+task.spawn(function()
+	while true do
+		if attacking then
+			for i = 1, 50 do
+				pcall(function()
+					ReplicatedStorage:WaitForChild("RemoteEvent"):WaitForChild("HitBox"):FireServer(unpack(args))
+				end)
+			end
+		end
+		task.wait(1)
+	end
+end)
+
+-- 显示 UI
+OrionLib:Init()
+
