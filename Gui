@@ -41,3 +41,133 @@ Tab:AddButton({
 		HRP.CFrame = CFrame.new(targetPosition)
 	end
 })
+
+Tab:AddButton({
+	Name = "地下商店 1",
+	Callback = function()
+		local Players = game:GetService("Players")
+		local LocalPlayer = Players.LocalPlayer
+		local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+		local HRP = Character:WaitForChild("HumanoidRootPart")
+		
+		local targetPosition = Vector3.new(225.86,-156.93,-43.64)
+		HRP.CFrame = CFrame.new(targetPosition)
+	end
+})
+
+Tab:AddButton({
+	Name = "绿色天堂",
+	Callback = function()
+		local Players = game:GetService("Players")
+		local LocalPlayer = Players.LocalPlayer
+		local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+		local HRP = Character:WaitForChild("HumanoidRootPart")
+		
+		local targetPosition = Vector3.new(246.85,-286.32,-183.40)
+		HRP.CFrame = CFrame.new(targetPosition)
+	end
+})
+
+Tab:AddButton({
+	Name = "逆向森林入口",
+	Callback = function()
+		local Players = game:GetService("Players")
+		local LocalPlayer = Players.LocalPlayer
+		local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+		local HRP = Character:WaitForChild("HumanoidRootPart")
+		
+		local targetPosition = Vector3.new(91.87,-282.86,233.95)
+		HRP.CFrame = CFrame.new(targetPosition)
+	end
+})
+
+Tab:AddButton({
+	Name = "传送到 (52.97, 14.65, 16.85)",
+	Callback = function()
+		local Players = game:GetService("Players")
+		local LocalPlayer = Players.LocalPlayer
+		local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+		local HRP = Character:WaitForChild("HumanoidRootPart")
+		
+		local targetPosition = Vector3.new(52.97, 14.65, 16.85)
+		HRP.CFrame = CFrame.new(targetPosition)
+	end
+})
+
+Tab:AddButton({
+	Name = "逆向森林商店",
+	Callback = function()
+		local Players = game:GetService("Players")
+		local LocalPlayer = Players.LocalPlayer
+		local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+		local HRP = Character:WaitForChild("HumanoidRootPart")
+		
+		local targetPosition = Vector3.new(-272.34,-289.04,-95.76)
+		HRP.CFrame = CFrame.new(targetPosition)
+	end
+})
+
+Tab:AddButton({
+	Name = "传送到 (52.97, 14.65, 16.85)",
+	Callback = function()
+		local Players = game:GetService("Players")
+		local LocalPlayer = Players.LocalPlayer
+		local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+		local HRP = Character:WaitForChild("HumanoidRootPart")
+		
+		local targetPosition = Vector3.new(52.97, 14.65, 16.85)
+		HRP.CFrame = CFrame.new(targetPosition)
+	end
+})
+
+Tab:AddButton({
+	Name = "逆向森林第二层",
+	Callback = function()
+		local Players = game:GetService("Players")
+		local LocalPlayer = Players.LocalPlayer
+		local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+		local HRP = Character:WaitForChild("HumanoidRootPart")
+		
+		local targetPosition = Vector3.new(325.18,-361.00,-66.84)
+		HRP.CFrame = CFrame.new(targetPosition)
+	end
+})
+
+Tab:AddButton({
+	Name = "石英洞",
+	Callback = function()
+		local Players = game:GetService("Players")
+		local LocalPlayer = Players.LocalPlayer
+		local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+		local HRP = Character:WaitForChild("HumanoidRootPart")
+		
+		local targetPosition = Vector3.new(464.67,-367.15,175.27)
+		HRP.CFrame = CFrame.new(targetPosition)
+	end
+})
+
+Tab:AddButton({
+	Name = "白色旋风",
+	Callback = function()
+		local Players = game:GetService("Players")
+		local LocalPlayer = Players.LocalPlayer
+		local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+		local HRP = Character:WaitForChild("HumanoidRootPart")
+		
+		local targetPosition = Vector3.new(37.92,-455.49,106.05)
+		HRP.CFrame = CFrame.new(targetPosition)
+	end
+})
+
+Tab:AddButton({
+	Name = "魔法森林",
+	Callback = function()
+		local Players = game:GetService("Players")
+		local LocalPlayer = Players.LocalPlayer
+		local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+		local HRP = Character:WaitForChild("HumanoidRootPart")
+		
+		local targetPosition = Vector3.new(395.07,-609.07,377.68)
+		HRP.CFrame = CFrame.new(targetPosition)
+	end
+})
