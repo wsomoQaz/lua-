@@ -175,7 +175,22 @@ Tab:AddButton({
 
 -- 创建一个功能 Tab
 local Tab = Window:MakeTab({
-    Name = "地点",
+    Name = "矿石",
     Icon = "rbxassetid://7733779610", -- 图标素材ID
     PremiumOnly = false
+})
+
+Tab:AddToggle({
+	Name = "自动功能开关",     -- 显示在界面的文字
+	Default = false,         -- 初始是否勾选
+	Save = false,            -- 是否保存配置
+	Callback = function(Value) -- 勾选状态改变时触发
+		if Value then
+			print("已开启")
+			-- 你要执行的开启逻辑放这里
+		else
+			print("已关闭")
+			-- 你要执行的关闭逻辑放这里
+		end
+	end    
 })
