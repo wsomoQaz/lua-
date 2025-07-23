@@ -127,17 +127,95 @@ HRP.CFrame = CFrame.new(targetPosition)
 })
 
 Tab:AddButton({
-    Name = "按钮名称",
+    Name = "方台鲜石",
     Callback = function()
         local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
 local LocalPlayer = Players.LocalPlayer
 local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 local HRP = Character:WaitForChild("HumanoidRootPart")
 
--- 指定目标坐标
-local targetPosition = Vector3.new(469.26, -369.15, 169.33)
+-- 创建 GUI
+local gui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
+gui.Name = "AutoTeleportGUI"
 
--- 执行传送
-HRP.CFrame = CFrame.new(targetPosition)
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 220, 0, 110)
+frame.Position = UDim2.new(0.5, -110, 0.4, 0)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.Active = true
+frame.Draggable = true
+
+local toggleButton = Instance.new("TextButton", frame)
+toggleButton.Size = UDim2.new(1, 0, 0, 30)
+toggleButton.Text = "🔽 显示控制"
+toggleButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+toggleButton.TextColor3 = Color3.new(1,1,1)
+toggleButton.Font = Enum.Font.SourceSansBold
+toggleButton.TextSize = 18
+
+local controlPanel = Instance.new("Frame", frame)
+controlPanel.Position = UDim2.new(0, 0, 0, 35)
+controlPanel.Size = UDim2.new(1, 0, 1, -35)
+controlPanel.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+
+local teleportButton = Instance.new("TextButton", controlPanel)
+teleportButton.Size = UDim2.new(1, -10, 0, 40)
+teleportButton.Position = UDim2.new(0, 5, 0, 5)
+teleportButton.Text = "开始自动追踪矿石"
+teleportButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+teleportButton.TextColor3 = Color3.new(1,1,1)
+teleportButton.Font = Enum.Font.SourceSansBold
+teleportButton.TextSize = 18
+
+-- 折叠控制
+local expanded = true
+toggleButton.MouseButton1Click:Connect(function()
+	expanded = not expanded
+	controlPanel.Visible = expanded
+	toggleButton.Text = expanded and "🔽 显示控制" or "▶️ 展开控制"
+	frame.Size = expanded and UDim2.new(0, 220, 0, 110) or UDim2.new(0, 220, 0, 35)
+end)
+
+-- 自动追踪功能
+local tracking = false
+local currentTarget = nil
+
+-- 递归搜索所有 StoneMain
+local function findNextValidStone()
+	for _, obj in ipairs(Workspace:GetDescendants()) do
+		if obj:IsA("BasePart") and obj.Name == "StoneMain" and obj.Parent and obj.Parent:IsDescendantOf(Workspace.OreArea) then
+			return obj
+		end
+	end
+	return nil
+end
+
+-- 追踪循环
+RunService.RenderStepped:Connect(function()
+	if tracking and currentTarget and currentTarget:IsDescendantOf(Workspace) then
+		-- 保持在矿石上方
+		HRP.CFrame = currentTarget.CFrame + Vector3.new(0, 6, 0)
+	elseif tracking then
+		-- 当前矿石消失，寻找下一个
+		local nextStone = findNextValidStone()
+		if nextStone then
+			currentTarget = nextStone
+		end
+	end
+end)
+
+-- 点击按钮开始传送并追踪
+teleportButton.MouseButton1Click:Connect(function()
+	tracking = not tracking
+	if tracking then
+		currentTarget = findNextValidStone()
+		teleportButton.Text = "停止追踪"
+	else
+		currentTarget = nil
+		teleportButton.Text = "开始自动追踪矿石"
+	end
+end)[""] = true,
     end
 })
