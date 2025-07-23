@@ -194,3 +194,9 @@ Tab:AddToggle({
 		end
 	end    
 })
+
+OrionLib:MakeNotification({
+    Name = "已开启",
+    Content = "功能已打开 ✔️",
+    Time = 2
+})
