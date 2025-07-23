@@ -111,15 +111,17 @@ HRP.CFrame = CFrame.new(targetPosition)
 })
 
 Tab:AddButton({
-    Name = "传送到目标位置",
+    Name = "按钮名称",
     Callback = function()
-        local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-        local HRP = Character:WaitForChild("HumanoidRootPart")
+        local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HRP = Character:WaitForChild("HumanoidRootPart")
 
-        -- 目标坐标（使用你最新提供的坐标）
-        local targetPosition = Vector3.new(469.26, -369.15, 169.33)
+-- 指定目标坐标
+local targetPosition = Vector3.new(469.26, -369.15, 169.33)
 
-        -- 执行传送
-        HRP.CFrame = CFrame.new(targetPosition)
+-- 执行传送
+HRP.CFrame = CFrame.new(targetPosition)
     end
 })
