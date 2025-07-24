@@ -195,3 +195,17 @@ Tab:AddToggle({
       print(Value) -- Value 为 true/false
     end
   })
+
+local Tab = Window:MakeTab({
+    Name = "地点",
+    Icon = "rbxassetid://7733779610", -- 图标素材ID
+    PremiumOnly = false
+})
+
+Tab:AddToggle({
+    Name = "开关名称",
+    Default = false,
+    Callback = function(Value)
+        -- Value 为 true 或 false
+    end
+})
