@@ -598,6 +598,37 @@ local remote = ReplicatedStorage:WaitForChild("RemoteEvent"):WaitForChild("HitBo
 
 local autoClick = false
 
+-- 自动触发 HitBox
+task.spawn(function()
+    while true do
+        if autoClick then
+            local args = {
+                5,
+                "Standard",
+                false,
+                "Lead Pickaxe",
+                1
+            }
+            remote:FireServer(unpack(args))
+        end
+        task.wait(0.02) -- 每秒 50 次
+    end
+end)
+
+-- OrionLib 开关按钮
+Tab:AddToggle({
+    Name = "锡镐",
+    Default = false,
+    Callback = function(Value)
+        autoClick = Value
+    end
+})
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local remote = ReplicatedStorage:WaitForChild("RemoteEvent"):WaitForChild("HitBox")
+
+local autoClick = false
+
 -- 自动远程调用
 task.spawn(function()
     while true do
