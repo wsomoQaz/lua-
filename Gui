@@ -219,7 +219,7 @@ end)
 
 -- 加入 GUI 开关按钮
 Tab:AddToggle({
-    Name = "自动传送 石头",
+    Name = "自动传送 岩石",
     Default = false,
     Callback = function(Value)
         autoTP = Value
