@@ -685,3 +685,34 @@ Tab:AddToggle({
         autoClick = Value
     end
 })
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local remote = ReplicatedStorage:WaitForChild("RemoteEvent"):WaitForChild("HitBox")
+
+local autoClick = false
+
+-- 自动调用 FireServer
+task.spawn(function()
+    while true do
+        if autoClick then
+            local args = {
+                20,
+                "Standard",
+                false,
+                "Xplr. Pickaxe",
+                0.85
+            }
+            remote:FireServer(unpack(args))
+        end
+        task.wait(0.02) -- 每秒 50 次
+    end
+end)
+
+-- OrionLib 控制按钮
+Tab:AddToggle({
+    Name = "Xplr镐",
+    Default = false,
+    Callback = function(Value)
+        autoClick = Value
+    end
+})
