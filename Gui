@@ -168,7 +168,7 @@ Tab:AddDropdown({
     end
 })
 
-Tab:AddToggle({
+Tab1:AddToggle({
     Name = "开关名称",
     Default = false,
     Callback = function(Value)
@@ -176,7 +176,7 @@ Tab:AddToggle({
     end
 })
 
-Tab:AddToggle({
+Tab2:AddToggle({
 	Name = "夜视",
 	Default = false,
 	Callback = function(Value)
@@ -188,7 +188,7 @@ Tab:AddToggle({
 	end
 })
 
-Tab:AddToggle({
+Tab3:AddToggle({
     Name = "Example Toggle",
     Default = false,
     Callback = function(Value)
@@ -202,7 +202,7 @@ local Tab = Window:MakeTab({
     PremiumOnly = false
 })
 
-Tab:AddToggle({
+Tab4:AddToggle({
     Name = "开关名称",
     Default = false,
     Callback = function(Value)
