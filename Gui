@@ -357,3 +357,60 @@ Tab:AddToggle({
     end
 })
 
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local LocalPlayer = Players.LocalPlayer
+
+local autoTP = false -- 控制开关
+
+-- 获取 Workspace 中所有名为 Center 的 BasePart
+local function getAllCenters()
+    local centers = {}
+
+    for _, obj in pairs(Workspace:GetDescendants()) do
+        if obj:IsA("BasePart") and obj.Name == "Center" then
+            table.insert(centers, obj)
+        end
+    end
+
+    return centers
+end
+
+-- 传送函数
+local function teleportTo(part)
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        LocalPlayer.Character.HumanoidRootPart.CFrame = part.CFrame + Vector3.new(0, 3, 0)
+    end
+end
+
+-- 自动传送逻辑
+task.spawn(function()
+    while true do
+        if autoTP then
+            local centers = getAllCenters()
+
+            for _, center in ipairs(centers) do
+                if not autoTP then break end
+
+                if center and center:IsDescendantOf(game) then
+                    teleportTo(center)
+
+                    -- 等待该 Center 是否还存在
+                    while center and center:IsDescendantOf(game) and autoTP do
+                        task.wait(0.2)
+                    end
+                end
+            end
+        end
+        task.wait(1) -- 没有 Center 时的等待
+    end
+end)
+
+-- GUI 控制按钮（OrionLib 示例）
+Tab:AddToggle({
+    Name = "自动传送所有 Center",
+    Default = false,
+    Callback = function(Value)
+        autoTP = Value
+    end
+})
