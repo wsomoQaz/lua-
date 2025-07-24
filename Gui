@@ -1,5 +1,5 @@
 -- 保留的 OrionLib 框架结构
-local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/wsomoQaz/lua-/main/Xcccc"))()
+local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/wsomoQaz/lua-/main/vc"))()
 
 local Window = OrionLib:MakeWindow({
     IntroText = "深渊矿工",  -- 加载动画文字
