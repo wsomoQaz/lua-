@@ -421,3 +421,69 @@ Tab:AddToggle({
         autoTP = Value
     end
 })
+
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local LocalPlayer = Players.LocalPlayer
+
+local autoTP = false -- 控制开关
+
+-- 获取 QuartzStone 下的所有 Center
+local function getQuartzCenters()
+    local centers = {}
+
+    local quartzFolder = Workspace:FindFirstChild("OreArea")
+        and Workspace.OreArea:FindFirstChild("Quartz-Cave")
+        and Workspace.OreArea["Quartz-Cave"]:FindFirstChild("StoneArea-Layer1")
+        and Workspace.OreArea["Quartz-Cave"]["StoneArea-Layer1"]:FindFirstChild("Amount")
+        and Workspace.OreArea["Quartz-Cave"]["StoneArea-Layer1"].Amount:FindFirstChild("QuartzStone")
+
+    if quartzFolder then
+        for _, obj in pairs(quartzFolder:GetChildren()) do
+            if obj:IsA("BasePart") and obj.Name == "Center" then
+                table.insert(centers, obj)
+            end
+        end
+    end
+
+    return centers
+end
+
+-- 传送函数
+local function teleportTo(part)
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        LocalPlayer.Character.HumanoidRootPart.CFrame = part.CFrame + Vector3.new(0, 3, 0)
+    end
+end
+
+-- 自动传送循环
+task.spawn(function()
+    while true do
+        if autoTP then
+            local centers = getQuartzCenters()
+
+            for _, center in ipairs(centers) do
+                if not autoTP then break end
+
+                if center and center:IsDescendantOf(game) then
+                    teleportTo(center)
+
+                    -- 等待当前 Center 是否还存在
+                    while center and center:IsDescendantOf(game) and autoTP do
+                        task.wait(0.2)
+                    end
+                end
+            end
+        end
+        task.wait(0.5)
+    end
+end)
+
+-- OrionLib GUI 控制开关
+Tab:AddToggle({
+    Name = "自动传送 石英",
+    Default = false,
+    Callback = function(Value)
+        autoTP = Value
+    end
+})
