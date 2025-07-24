@@ -1,179 +1,151 @@
 loadstring(game:HttpGet("https://pastebin.com/raw/6xQ5gtbj"))();
--- 保留的 OrionLib 框架结构
 local OrionLib = loadstring(game:HttpGet("https://pastebin.com/raw/FUEx0f3G"))()
+local Window = OrionLib:MakeWindow({Name = "深渊矿工", HidePremium = false, SaveConfig = false, IntroText = "欢迎使用", ConfigFolder = "欢迎使用"})
 
-local Window = OrionLib:MakeWindow({
-    IntroText = "深渊矿工",  -- 加载动画文字
-    Name = "深渊矿工 " .. identifyexecutor(), -- 脚本名字，显示执行器
-    HidePremium = false,
-    SaveConfig = true,
-    ConfigFolder = ""
-})
-
--- 创建一个功能 Tab
 local Tab = Window:MakeTab({
     Name = "地点",
-    Icon = "rbxassetid://7733779610", -- 图标素材ID
+    Icon = "rbxassetid://7734068321",
     PremiumOnly = false
 })
 
 Tab:AddButton({
-	Name = "商人",
-	Callback = function()
-		local Players = game:GetService("Players")
-		local LocalPlayer = Players.LocalPlayer
-		local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-		local HRP = Character:WaitForChild("HumanoidRootPart")
-		
-		local targetPosition = Vector3.new(52.97, 14.65, 16.85)
-		HRP.CFrame = CFrame.new(targetPosition)
-	end
+        Name = "商人",
+        Callback = function()
+                local Players = game:GetService("Players")
+                local LocalPlayer = Players.LocalPlayer
+                local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+                local HRP = Character:WaitForChild("HumanoidRootPart")
+
+                local targetPosition = Vector3.new(52.97, 14.65, 16.85)
+                HRP.CFrame = CFrame.new(targetPosition)
+        end
 })
 
 Tab:AddButton({
-	Name = "电梯",
-	Callback = function()
-		local Players = game:GetService("Players")
-		local LocalPlayer = Players.LocalPlayer
-		local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-		local HRP = Character:WaitForChild("HumanoidRootPart")
-		
-		local targetPosition = Vector3.new(231.63,12.66,27.58)
-		HRP.CFrame = CFrame.new(targetPosition)
-	end
+        Name = "电梯",
+        Callback = function()
+                local Players = game:GetService("Players")
+                local LocalPlayer = Players.LocalPlayer
+                local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+                local HRP = Character:WaitForChild("HumanoidRootPart")
+
+                local targetPosition = Vector3.new(231.63,12.66,27.58)
+                HRP.CFrame = CFrame.new(targetPosition)
+        end
 })
 
 Tab:AddButton({
-	Name = "地下商店 1",
-	Callback = function()
-		local Players = game:GetService("Players")
-		local LocalPlayer = Players.LocalPlayer
-		local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-		local HRP = Character:WaitForChild("HumanoidRootPart")
-		
-		local targetPosition = Vector3.new(225.86,-156.93,-43.64)
-		HRP.CFrame = CFrame.new(targetPosition)
-	end
+        Name = "地下商店 1",
+        Callback = function()
+                local Players = game:GetService("Players")
+                local LocalPlayer = Players.LocalPlayer
+                local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+                local HRP = Character:WaitForChild("HumanoidRootPart")
+
+                local targetPosition = Vector3.new(225.86,-156.93,-43.64)
+                HRP.CFrame = CFrame.new(targetPosition)
+        end
 })
 
 Tab:AddButton({
-	Name = "绿色天堂",
-	Callback = function()
-		local Players = game:GetService("Players")
-		local LocalPlayer = Players.LocalPlayer
-		local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-		local HRP = Character:WaitForChild("HumanoidRootPart")
-		
-		local targetPosition = Vector3.new(246.85,-286.32,-183.40)
-		HRP.CFrame = CFrame.new(targetPosition)
-	end
+        Name = "绿色天堂",
+        Callback = function()
+                local Players = game:GetService("Players")
+                local LocalPlayer = Players.LocalPlayer
+                local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+                local HRP = Character:WaitForChild("HumanoidRootPart")
+
+                local targetPosition = Vector3.new(246.85,-286.32,-183.40)
+                HRP.CFrame = CFrame.new(targetPosition)
+        end
 })
 
 Tab:AddButton({
-	Name = "逆向森林入口",
-	Callback = function()
-		local Players = game:GetService("Players")
-		local LocalPlayer = Players.LocalPlayer
-		local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-		local HRP = Character:WaitForChild("HumanoidRootPart")
-		
-		local targetPosition = Vector3.new(91.87,-282.86,233.95)
-		HRP.CFrame = CFrame.new(targetPosition)
-	end
-})
+        Name = "逆向森林入口",
+        Callback = function()
+                local Players = game:GetService("Players")
+                local LocalPlayer = Players.LocalPlayer
+                local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+                local HRP = Character:WaitForChild("HumanoidRootPart")
 
-
-
-Tab:AddButton({
-	Name = "逆向森林商店",
-	Callback = function()
-		local Players = game:GetService("Players")
-		local LocalPlayer = Players.LocalPlayer
-		local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-		local HRP = Character:WaitForChild("HumanoidRootPart")
-		
-		local targetPosition = Vector3.new(-272.34,-289.04,-95.76)
-		HRP.CFrame = CFrame.new(targetPosition)
-	end
+                local targetPosition = Vector3.new(91.87,-282.86,233.95)
+                HRP.CFrame = CFrame.new(targetPosition)
+        end
 })
 
 
 
 Tab:AddButton({
-	Name = "逆向森林第二层",
-	Callback = function()
-		local Players = game:GetService("Players")
-		local LocalPlayer = Players.LocalPlayer
-		local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-		local HRP = Character:WaitForChild("HumanoidRootPart")
-		
-		local targetPosition = Vector3.new(325.18,-361.00,-66.84)
-		HRP.CFrame = CFrame.new(targetPosition)
-	end
+        Name = "逆向森林商店",
+        Callback = function()
+                local Players = game:GetService("Players")
+                local LocalPlayer = Players.LocalPlayer
+                local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+                local HRP = Character:WaitForChild("HumanoidRootPart")
+
+                local targetPosition = Vector3.new(-272.34,-289.04,-95.76)
+                HRP.CFrame = CFrame.new(targetPosition)
+        end
+})
+
+
+
+Tab:AddButton({
+        Name = "逆向森林第二层",
+        Callback = function()
+                local Players = game:GetService("Players")
+                local LocalPlayer = Players.LocalPlayer
+                local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+                local HRP = Character:WaitForChild("HumanoidRootPart")
+
+                local targetPosition = Vector3.new(325.18,-361.00,-66.84)
+                HRP.CFrame = CFrame.new(targetPosition)
+        end
 })
 
 Tab:AddButton({
-	Name = "石英洞",
-	Callback = function()
-		local Players = game:GetService("Players")
-		local LocalPlayer = Players.LocalPlayer
-		local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-		local HRP = Character:WaitForChild("HumanoidRootPart")
-		
-		local targetPosition = Vector3.new(464.67,-367.15,175.27)
-		HRP.CFrame = CFrame.new(targetPosition)
-	end
+        Name = "石英洞",
+        Callback = function()
+                local Players = game:GetService("Players")
+                local LocalPlayer = Players.LocalPlayer
+                local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+                local HRP = Character:WaitForChild("HumanoidRootPart")
+
+                local targetPosition = Vector3.new(464.67,-367.15,175.27)
+                HRP.CFrame = CFrame.new(targetPosition)
+        end
 })
 
 Tab:AddButton({
-	Name = "白色旋风",
-	Callback = function()
-		local Players = game:GetService("Players")
-		local LocalPlayer = Players.LocalPlayer
-		local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-		local HRP = Character:WaitForChild("HumanoidRootPart")
-		
-		local targetPosition = Vector3.new(37.92,-455.49,106.05)
-		HRP.CFrame = CFrame.new(targetPosition)
-	end
+        Name = "白色旋风",
+        Callback = function()
+                local Players = game:GetService("Players")
+                local LocalPlayer = Players.LocalPlayer
+                local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+                local HRP = Character:WaitForChild("HumanoidRootPart")
+
+                local targetPosition = Vector3.new(37.92,-455.49,106.05)
+                HRP.CFrame = CFrame.new(targetPosition)
+        end
 })
 
 Tab:AddButton({
-	Name = "魔法森林",
-	Callback = function()
-		local Players = game:GetService("Players")
-		local LocalPlayer = Players.LocalPlayer
-		local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-		local HRP = Character:WaitForChild("HumanoidRootPart")
-		
-		local targetPosition = Vector3.new(395.07,-609.07,377.68)
-		HRP.CFrame = CFrame.new(targetPosition)
-	end
+        Name = "魔法森林",
+        Callback = function()
+                local Players = game:GetService("Players")
+                local LocalPlayer = Players.LocalPlayer
+                local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+                local HRP = Character:WaitForChild("HumanoidRootPart")
+
+                local targetPosition = Vector3.new(395.07,-609.07,377.68)
+                HRP.CFrame = CFrame.new(targetPosition)
+        end
 })
 
-
--- 创建一个功能 Tab
 local Tab = Window:MakeTab({
-    Name = "功能",
-    Icon = "rbxassetid://7733779610", -- 图标素材ID
-    PremiumOnly = false
-})
-
-Tab:AddDropdown({
-    Name = "下拉菜单名称",
-    Default = "选项1",
-    Options = {"选项1", "选项2", "选项3"},
-    Callback = function(selected)
-        -- selected 为选择的内容
-    end
-})
-
-Tab:AddToggle({
-    Name = "开关名称",
-    Default = false,
-    Callback = function(Value)
-        -- Value 为 true 或 false
-    end
+	Name = "矿石",
+	Icon = "rbxassetid://7734068321",
+	PremiumOnly = false
 })
 
 Tab:AddToggle({
@@ -187,13 +159,11 @@ Tab:AddToggle({
 		end
 	end
 })
-
+ 
 Tab:AddToggle({
-    Name = "Example Toggle",
+    Name = "石头",
     Default = false,
     Callback = function(Value)
-      print(Value) -- Value 为 true/false
+        
     end
-  })
-
-OrionLib:Init()
+})
