@@ -187,3 +187,11 @@ Tab:AddToggle({
 		end
 	end
 })
+
+Tab:AddToggle({
+    Name = "Example Toggle",
+    Default = false,
+    Callback = function(Value)
+      print(Value) -- Value 为 true/false
+    end
+  })
