@@ -225,3 +225,68 @@ Tab:AddToggle({
         autoTP = Value
     end
 })
+
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local LocalPlayer = Players.LocalPlayer
+
+local autoTP = false  -- 控制开关
+
+-- 获取所有 ShapeStone.Center
+local function getShapeStoneCenters()
+    local centers = {}
+    local folder = Workspace:FindFirstChild("Map")
+        and Workspace.Map:FindFirstChild("Layer 1")
+        and Workspace.Map["Layer 1"]:FindFirstChild("StoneArea2")
+        and Workspace.Map["Layer 1"].StoneArea2:FindFirstChild("Amount")
+        and Workspace.Map["Layer 1"].StoneArea2.Amount:FindFirstChild("ShapeStone")
+
+    if folder then
+        for _, obj in pairs(folder:GetChildren()) do
+            if obj:IsA("BasePart") and obj.Name == "Center" then
+                table.insert(centers, obj)
+            end
+        end
+    end
+
+    return centers
+end
+
+-- 传送函数
+local function teleportTo(part)
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        LocalPlayer.Character.HumanoidRootPart.CFrame = part.CFrame + Vector3.new(0, 3, 0)
+    end
+end
+
+-- 自动传送循环
+task.spawn(function()
+    while true do
+        if autoTP then
+            local centers = getShapeStoneCenters()
+
+            for _, center in ipairs(centers) do
+                if not autoTP then break end -- 关闭中止
+
+                if center and center:IsDescendantOf(game) then
+                    teleportTo(center)
+
+                    -- 等待该 center 被挖掉
+                    while center and center:IsDescendantOf(game) and autoTP do
+                        task.wait(0.2)
+                    end
+                end
+            end
+        end
+        task.wait(0.5)
+    end
+end)
+
+-- 加入 GUI 控制按钮（OrionLib）
+Tab:AddToggle({
+    Name = "自动传送 岩石2",
+    Default = false,
+    Callback = function(Value)
+        autoTP = Value
+    end
+})
