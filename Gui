@@ -164,6 +164,51 @@ Tab:AddToggle({
     Name = "石头",
     Default = false,
     Callback = function(Value)
-        
+        local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local LocalPlayer = Players.LocalPlayer
+
+local function getAllCenters()
+    local centers = {}
+    local oreFolder = Workspace:FindFirstChild("Map")
+        and Workspace.Map:FindFirstChild("Layer 1")
+        and Workspace.Map["Layer 1"]:FindFirstChild("StoneArea")
+        and Workspace.Map["Layer 1"].StoneArea:FindFirstChild("Amount")
+        and Workspace.Map["Layer 1"].StoneArea.Amount:FindFirstChild("StoneOre")
+    
+    if oreFolder then
+        for _, obj in pairs(oreFolder:GetChildren()) do
+            if obj:IsA("BasePart") and obj.Name == "Center" then
+                table.insert(centers, obj)
+            end
+        end
+    end
+    
+    return centers
+end
+
+local function teleportTo(part)
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        LocalPlayer.Character.HumanoidRootPart.CFrame = part.CFrame + Vector3.new(0, 3, 0) -- 传送到 Center 上方
+    end
+end
+
+-- 自动传送循环
+while true do
+    local centers = getAllCenters()
+    
+    for _, center in ipairs(centers) do
+        if center and center.Parent then
+            teleportTo(center)
+
+            -- 等待它是否还存在（被挖了就会被删除）
+            while center and center.Parent and center:IsDescendantOf(game) do
+                task.wait(0.2) -- 等待一小会
+            end
+        end
+    end
+    
+    task.wait(1) -- 没有 Center 的时候等待一下再重新尝试
+end
     end
 })
