@@ -290,3 +290,69 @@ Tab:AddToggle({
         autoTP = Value
     end
 })
+
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local LocalPlayer = Players.LocalPlayer
+
+local autoTP = false  -- 控制开关
+
+-- 获取所有 Grass（只从指定路径下查找）
+local function getAllGrassParts()
+    local grasses = {}
+    local baseFolder = Workspace:FindFirstChild("OreArea")
+        and Workspace.OreArea:FindFirstChild("StoneInGreanHeaven")
+        and Workspace.OreArea.StoneInGreanHeaven:FindFirstChild("StoneArea-Layer1")
+        and Workspace.OreArea.StoneInGreanHeaven["StoneArea-Layer1"]:FindFirstChild("Amount")
+        and Workspace.OreArea.StoneInGreanHeaven["StoneArea-Layer1"].Amount:FindFirstChild("MossStone")
+        and Workspace.OreArea.StoneInGreanHeaven["StoneArea-Layer1"].Amount.MossStone:FindFirstChild("StoneMain")
+
+    if baseFolder then
+        for _, obj in pairs(baseFolder:GetChildren()) do
+            if obj:IsA("BasePart") and obj.Name == "Grass" then
+                table.insert(grasses, obj)
+            end
+        end
+    end
+
+    return grasses
+end
+
+-- 传送函数
+local function teleportTo(part)
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        LocalPlayer.Character.HumanoidRootPart.CFrame = part.CFrame + Vector3.new(0, 3, 0)
+    end
+end
+
+-- 自动传送循环
+task.spawn(function()
+    while true do
+        if autoTP then
+            local grassList = getAllGrassParts()
+
+            for _, grass in ipairs(grassList) do
+                if not autoTP then break end  -- 退出开关控制
+
+                if grass and grass:IsDescendantOf(game) then
+                    teleportTo(grass)
+
+                    -- 等待该 Grass 是否还存在
+                    while grass and grass:IsDescendantOf(game) and autoTP do
+                        task.wait(0.2)
+                    end
+                end
+            end
+        end
+        task.wait(0.5) -- 每轮检查间隔
+    end
+end)
+
+-- OrionLib Tab 控制开关
+Tab:AddToggle({
+    Name = "自动传送 台鲜石",
+    Default = false,
+    Callback = function(Value)
+        autoTP = Value
+    end
+})
