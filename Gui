@@ -160,14 +160,14 @@ Tab:AddToggle({
 	end
 })
  
-Tab:AddToggle({
-    Name = "石头",
-    Default = false,
-    Callback = function(Value)
-        local Players = game:GetService("Players")
+local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local LocalPlayer = Players.LocalPlayer
 
+local autoTP = false  -- 控制开关标志
+local runService = game:GetService("RunService")
+
+-- 获取所有 Center 对象
 local function getAllCenters()
     local centers = {}
     local oreFolder = Workspace:FindFirstChild("Map")
@@ -175,7 +175,7 @@ local function getAllCenters()
         and Workspace.Map["Layer 1"]:FindFirstChild("StoneArea")
         and Workspace.Map["Layer 1"].StoneArea:FindFirstChild("Amount")
         and Workspace.Map["Layer 1"].StoneArea.Amount:FindFirstChild("StoneOre")
-    
+
     if oreFolder then
         for _, obj in pairs(oreFolder:GetChildren()) do
             if obj:IsA("BasePart") and obj.Name == "Center" then
@@ -183,32 +183,45 @@ local function getAllCenters()
             end
         end
     end
-    
+
     return centers
 end
 
+-- 传送函数
 local function teleportTo(part)
     if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        LocalPlayer.Character.HumanoidRootPart.CFrame = part.CFrame + Vector3.new(0, 3, 0) -- 传送到 Center 上方
+        LocalPlayer.Character.HumanoidRootPart.CFrame = part.CFrame + Vector3.new(0, 3, 0)
     end
 end
 
--- 自动传送循环
-while true do
-    local centers = getAllCenters()
-    
-    for _, center in ipairs(centers) do
-        if center and center.Parent then
-            teleportTo(center)
+-- 自动传送功能（放在独立协程中）
+task.spawn(function()
+    while true do
+        if autoTP then
+            local centers = getAllCenters()
 
-            -- 等待它是否还存在（被挖了就会被删除）
-            while center and center.Parent and center:IsDescendantOf(game) do
-                task.wait(0.2) -- 等待一小会
+            for _, center in ipairs(centers) do
+                if not autoTP then break end -- 如果中途关闭开关则退出循环
+
+                if center and center.Parent then
+                    teleportTo(center)
+
+                    -- 等待当前 Center 是否还存在
+                    while center and center:IsDescendantOf(game) and autoTP do
+                        task.wait(0.2)
+                    end
+                end
             end
         end
+        task.wait(0.5)
     end
-    
-    task.wait(1) -- 没有 Center 的时候等待一下再重新尝试
-end
+end)
+
+-- 加入 GUI 开关按钮
+Tab:AddToggle({
+    Name = "自动传送 Center",
+    Default = false,
+    Callback = function(Value)
+        autoTP = Value
     end
 })
