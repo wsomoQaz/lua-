@@ -1,0 +1,320 @@
+local player = game.Players.LocalPlayer
+local gui = Instance.new("ScreenGui")
+gui.Name = "SciFiControlPanel_Split"
+gui.Parent = player:WaitForChild("PlayerGui")
+gui.ResetOnSpawn = false
+
+local TweenService = game:GetService("TweenService")
+
+local panel = Instance.new("Frame")
+panel.Size = UDim2.new(0, 600, 0, 360) -- 先给正常尺寸，动画会覆盖它
+panel.Position = UDim2.new(0.5, -300, 0.5, -180) -- 先给正常位置，动画会覆盖
+panel.BackgroundColor3 = Color3.fromRGB(10, 15, 25)
+panel.BackgroundTransparency = 0.05
+panel.BorderSizePixel = 0
+panel.Active = true
+panel.Draggable = true
+panel.Parent = gui
+
+local panelCorner = Instance.new("UICorner")
+panelCorner.CornerRadius = UDim.new(0, 20)
+panelCorner.Parent = panel
+
+local stroke = Instance.new("UIStroke")
+stroke.Thickness = 3
+stroke.Color = Color3.fromRGB(0, 255, 200)
+stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+stroke.Parent = panel
+
+-- 标题栏
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -60, 0, 60)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.BackgroundColor3 = Color3.fromRGB(20, 25, 40)
+title.Text = "☢ by---脚本"
+title.TextColor3 = Color3.fromRGB(0, 255, 255)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 36
+title.BorderSizePixel = 0
+title.BackgroundTransparency = 0
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = panel
+
+local titleCorner = Instance.new("UICorner")
+titleCorner.CornerRadius = UDim.new(0, 20)
+titleCorner.Parent = title
+
+-- 关闭按钮（右上）
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0, 44, 0, 44)
+closeBtn.Position = UDim2.new(1, -50, 0, 8)
+closeBtn.Text = "✖"
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextSize = 30
+closeBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
+closeBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+closeBtn.BorderSizePixel = 0
+closeBtn.Parent = panel
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(1, 0)
+closeCorner.Parent = closeBtn
+
+-- 左侧功能区（30%宽）
+local leftFrame = Instance.new("Frame")
+leftFrame.Size = UDim2.new(0.3, -15, 1, -70)
+leftFrame.Position = UDim2.new(0, 10, 0, 60)
+leftFrame.BackgroundColor3 = Color3.fromRGB(15, 20, 30)
+leftFrame.BackgroundTransparency = 0.1
+leftFrame.BorderSizePixel = 0
+leftFrame.Parent = panel
+
+local leftCorner = Instance.new("UICorner")
+leftCorner.CornerRadius = UDim.new(0, 14)
+leftCorner.Parent = leftFrame
+
+-- 左侧滚动列表（功能按钮列表）
+local scrollFrame = Instance.new("ScrollingFrame")
+scrollFrame.Size = UDim2.new(1, -10, 0.7, 0)
+scrollFrame.Position = UDim2.new(0, 5, 0, 5)
+scrollFrame.BackgroundTransparency = 1
+scrollFrame.BorderSizePixel = 0
+scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+scrollFrame.ScrollBarThickness = 8
+scrollFrame.Parent = leftFrame
+
+-- 说明文本区（功能简介）
+local descLabel = Instance.new("TextLabel")
+descLabel.Size = UDim2.new(1, -10, 0.3, -10)
+descLabel.Position = UDim2.new(0, 5, 0.7, 5)
+descLabel.BackgroundTransparency = 0.1
+descLabel.BackgroundColor3 = Color3.fromRGB(20, 25, 35)
+descLabel.BorderSizePixel = 0
+descLabel.TextColor3 = Color3.fromRGB(180, 255, 255)
+descLabel.Font = Enum.Font.Gotham
+descLabel.TextSize = 18
+descLabel.TextWrapped = true
+descLabel.Text = "请选择左侧功能按钮查看简介。"
+descLabel.Parent = leftFrame
+
+local descCorner = Instance.new("UICorner")
+descCorner.CornerRadius = UDim.new(0, 12)
+descCorner.Parent = descLabel
+
+-- 右侧内容区（70%宽）
+local rightFrame = Instance.new("Frame")
+rightFrame.Size = UDim2.new(0.7, -15, 1, -70)
+rightFrame.Position = UDim2.new(0.3, 15, 0, 60)
+rightFrame.BackgroundColor3 = Color3.fromRGB(15, 20, 30)
+rightFrame.BackgroundTransparency = 0.1
+rightFrame.BorderSizePixel = 0
+rightFrame.Parent = panel
+
+local rightCorner = Instance.new("UICorner")
+rightCorner.CornerRadius = UDim.new(0, 14)
+rightCorner.Parent = rightFrame
+
+-- 右侧显示区域文本
+local contentLabel = Instance.new("TextLabel")
+contentLabel.Size = UDim2.new(1, -20, 0, 100)
+contentLabel.Position = UDim2.new(0, 10, 0, 10)
+contentLabel.BackgroundTransparency = 1
+contentLabel.TextColor3 = Color3.fromRGB(100, 255, 255)
+contentLabel.Font = Enum.Font.GothamBold
+contentLabel.TextSize = 26
+contentLabel.TextWrapped = true
+contentLabel.Text = "右侧区域显示功能详细内容"
+contentLabel.LayoutOrder = 0
+contentLabel.Parent = rightFrame
+
+local rightLayout = Instance.new("UIListLayout")
+rightLayout.SortOrder = Enum.SortOrder.LayoutOrder
+rightLayout.Padding = UDim.new(0, 8)
+rightLayout.Parent = rightFrame
+
+-- 功能列表及对应内容
+local features = {
+    {Name = "功能一", Description = "这是功能一的简介。", Content = "功能一的详细内容显示在这里。"},
+    {Name = "功能二", Description = "功能二的简介。", Content = "功能二的详细内容显示在这里。"},
+    {Name = "功能三", Description = "功能三简介。", Content = "功能三详细内容。"},
+    {Name = "功能四", Description = "功能四简介。", Content = "功能四详细内容。"},
+    {Name = "功能五", Description = "功能五简介。", Content = "功能五详细内容。"},
+}
+
+local function createFeatureButton(i, feature)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, -20, 0, 45)
+    btn.Position = UDim2.new(0, 10, 0, (i - 1) * 50)
+    btn.BackgroundColor3 = Color3.fromRGB(0, 180, 120)
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Text = feature.Name
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 22
+    btn.Parent = scrollFrame
+
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 8)
+    btnCorner.Parent = btn
+
+    btn.MouseButton1Click:Connect(function()
+        descLabel.Text = feature.Description
+        contentLabel.Text = feature.Content
+
+        -- 清理右侧旧控件（除了contentLabel）
+        for _, child in ipairs(rightFrame:GetChildren()) do
+            if child ~= contentLabel and (child:IsA("TextButton") or child:IsA("TextBox")) then
+                child:Destroy()
+            end
+        end
+
+        -- 创建“启动功能”按钮
+        local startBtn = Instance.new("TextButton")
+        startBtn.Size = UDim2.new(1, -20, 0, 40)
+        startBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 120)
+        startBtn.TextColor3 = Color3.new(1, 1, 1)
+        startBtn.Font = Enum.Font.GothamBold
+        startBtn.TextSize = 20
+        startBtn.Text = feature.Name .. " → 启动"
+        startBtn.LayoutOrder = 1
+        startBtn.Parent = rightFrame
+
+        local corner1 = Instance.new("UICorner", startBtn)
+        corner1.CornerRadius = UDim.new(0, 10)
+
+        startBtn.MouseButton1Click:Connect(function()
+            contentLabel.Text = feature.Name .. " 已启动！"
+        end)
+
+        -- 创建 Toggle 开关
+        local toggle = Instance.new("TextButton")
+        toggle.Size = UDim2.new(1, -20, 0, 40)
+        toggle.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+        toggle.TextColor3 = Color3.new(1, 1, 1)
+        toggle.Font = Enum.Font.GothamBold
+        toggle.TextSize = 20
+        toggle.Text = "状态：关闭"
+        toggle.LayoutOrder = 2
+        toggle.Parent = rightFrame
+
+        local corner2 = Instance.new("UICorner", toggle)
+        corner2.CornerRadius = UDim.new(0, 10)
+
+        local toggled = false
+        toggle.MouseButton1Click:Connect(function()
+            toggled = not toggled
+            toggle.Text = toggled and "状态：开启" or "状态：关闭"
+            toggle.BackgroundColor3 = toggled and Color3.fromRGB(50, 200, 80) or Color3.fromRGB(200, 50, 50)
+        end)
+    end)
+
+    return btn
+end
+
+local featureButtons = {}
+for i, feature in ipairs(features) do
+    local btn = createFeatureButton(i, feature)
+    table.insert(featureButtons, btn)
+end
+
+scrollFrame.CanvasSize = UDim2.new(0, 0, 0, #featureButtons * 50)
+
+local UserInputService = game:GetService("UserInputService")
+
+-- 悬浮按钮
+local circleBtn = Instance.new("TextButton", gui)
+circleBtn.Size = UDim2.new(0, 140, 0, 56)
+circleBtn.Position = UDim2.new(0.05, 0, 0.8, 0)
+circleBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 180)
+circleBtn.Text = "作者：wsomoQaz"
+circleBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+circleBtn.TextSize = 24
+circleBtn.Font = Enum.Font.GothamBold
+circleBtn.Visible = false
+circleBtn.ZIndex = 10
+
+local circleCorner = Instance.new("UICorner", circleBtn)
+circleCorner.CornerRadius = UDim.new(0, 28)
+
+local dragging
+local dragInput
+local dragStart
+local startPos
+
+circleBtn.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = circleBtn.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+circleBtn.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+local margin = 40
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        local newPos = UDim2.new(
+            math.clamp(startPos.X.Scale, 0, 1),
+            math.clamp(startPos.X.Offset + delta.X, -margin, gui.AbsoluteSize.X - circleBtn.AbsoluteSize.X + margin),
+            math.clamp(startPos.Y.Scale, 0, 1),
+            math.clamp(startPos.Y.Offset + delta.Y, -margin, gui.AbsoluteSize.Y - circleBtn.AbsoluteSize.Y + margin)
+        )
+        circleBtn.Position = newPos
+    end
+end)
+
+-- 关闭按钮事件
+closeBtn.MouseButton1Click:Connect(function()
+    panel.Visible = false
+    circleBtn.Visible = true
+end)
+
+circleBtn.MouseButton1Click:Connect(function()
+    panel.Visible = true
+    circleBtn.Visible = false
+
+    -- 每次打开都播放弹窗由小变大动画
+
+    -- 初始小尺寸居中
+    panel.Size = UDim2.new(0, 20, 0, 12)
+    panel.Position = UDim2.new(0.5, -10, 0.5, -6)
+    panel.BackgroundTransparency = 1
+    panel.Visible = true
+
+    local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+    local goal = {
+        Size = UDim2.new(0, 600, 0, 360),
+        Position = UDim2.new(0.5, -300, 0.5, -180),
+        BackgroundTransparency = 0.05
+    }
+    local tween = TweenService:Create(panel, tweenInfo, goal)
+    tween:Play()
+end)
+
+-- 脚本初始打开时播放动画
+panel.Size = UDim2.new(0, 20, 0, 12)
+panel.Position = UDim2.new(0.5, -10, 0.5, -6)
+panel.BackgroundTransparency = 1
+panel.Visible = true
+
+local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+local goal = {
+    Size = UDim2.new(0, 600, 0, 360),
+    Position = UDim2.new(0.5, -300, 0.5, -180),
+    BackgroundTransparency = 0.05
+}
+
+local tween = TweenService:Create(panel, tweenInfo, goal)
+tween:Play()
