@@ -553,3 +553,73 @@ Tab:AddToggle({
         autoTP = Value
     end
 })
+
+local Tab = Window:MakeTab({
+    Name = "工具",
+    Icon = "rbxassetid://7734068321",
+    PremiumOnly = false
+})
+
+Tab:AddLabel("一秒攻击50次")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local remote = ReplicatedStorage:WaitForChild("RemoteEvent"):WaitForChild("HitBox")
+
+local autoClick = false
+
+-- 循环触发远程事件
+task.spawn(function()
+    while true do
+        if autoClick then
+            local args = {
+                3,
+                "Standard",
+                false,
+                "Rusty Pickaxe",
+                1
+            }
+            remote:FireServer(unpack(args))
+        end
+        task.wait(0.02) -- 每秒约 50 次
+    end
+end)
+
+-- OrionLib 开关按钮
+Tab:AddToggle({
+    Name = "生锈镐子",
+    Default = false,
+    Callback = function(Value)
+        autoClick = Value
+    end
+})
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local remote = ReplicatedStorage:WaitForChild("RemoteEvent"):WaitForChild("HitBox")
+
+local autoClick = false
+
+-- 自动远程调用
+task.spawn(function()
+    while true do
+        if autoClick then
+            local args = {
+                10,
+                "Standard",
+                false,
+                "Iron Pickaxe",
+                1
+            }
+            remote:FireServer(unpack(args))
+        end
+        task.wait(0.02) -- 0.02秒执行一次 ≈ 每秒50次
+    end
+end)
+
+-- 加入 OrionLib Toggle 开关
+Tab:AddToggle({
+    Name = "铁镐",
+    Default = false,
+    Callback = function(Value)
+        autoClick = Value
+    end
+})
