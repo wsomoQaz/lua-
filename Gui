@@ -547,7 +547,7 @@ end)
 
 -- OrionLib 控制按钮
 Tab:AddToggle({
-    Name = "自动传送 CubeStone.Center",
+    Name = "自动传送 方块台鲜石",
     Default = false,
     Callback = function(Value)
         autoTP = Value
