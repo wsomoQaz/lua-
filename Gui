@@ -414,7 +414,7 @@ end)
 
 -- 加入 GUI 控制按钮（OrionLib）
 Tab:AddToggle({
-    Name = "自动传送 WoodSeal.Center",
+    Name = "自动传送 黑岩",
     Default = false,
     Callback = function(Value)
         autoTP = Value
