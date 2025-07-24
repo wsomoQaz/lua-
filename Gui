@@ -716,3 +716,9 @@ Tab:AddToggle({
         autoClick = Value
     end
 })
+
+local Tab = Window:MakeTab({
+    Name = "选择工具",
+    Icon = "rbxassetid://7734068321",
+    PremiumOnly = false
+})
