@@ -723,3 +723,27 @@ local Tab = Window:MakeTab({
     PremiumOnly = false
 })
 
+local ToggleState = false
+local args = {
+	45,
+	"Heavy",
+	false,
+	"Heavy Pickaxe",
+	1.3
+}
+
+Tab:AddToggle({
+	Name = "重型镐",
+	Default = false,
+	Callback = function(Value)
+		ToggleState = Value
+		if ToggleState then
+			task.spawn(function()
+				while ToggleState do
+					game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvent"):WaitForChild("HitBox"):FireServer(unpack(args))
+					task.wait(0.02)
+				end
+			end)
+		end
+	end
+})
