@@ -718,16 +718,8 @@ Tab:AddToggle({
 })
 
 local Tab = Window:MakeTab({
-    Name = "选择工具",
+    Name = "H级锄头",
     Icon = "rbxassetid://7734068321",
     PremiumOnly = false
-})
-
-Tab:AddToggle({
-    Name = "Xplr镐",
-    Default = false,
-    Callback = function(Value)
-        
-    end
 })
 
