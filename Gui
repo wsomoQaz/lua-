@@ -723,3 +723,11 @@ local Tab = Window:MakeTab({
     PremiumOnly = false
 })
 
+Tab:AddToggle({
+    Name = "Xplr镐",
+    Default = false,
+    Callback = function(Value)
+        
+    end
+})
+
