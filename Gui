@@ -747,3 +747,46 @@ Tab:AddToggle({
 		end
 	end
 })
+
+local Tab = Window:MakeTab({
+    Name = "钻头",
+    Icon = "rbxassetid://7734068321",
+    PremiumOnly = false
+})
+
+local Tab = Window:MakeTab({
+    Name = "长予",
+    Icon = "rbxassetid://7734068321",
+    PremiumOnly = false
+})
+
+local Tab = Window:MakeTab({
+    Name = "拳击",
+    Icon = "rbxassetid://7734068321",
+    PremiumOnly = false
+})
+
+local ToggleState = false
+
+Tab:AddToggle({
+	Name = "快速攻击（拳头）",
+	Default = false,
+	Callback = function(Value)
+		ToggleState = Value
+		if ToggleState then
+			task.spawn(function()
+				while ToggleState do
+					local args = {
+						150,
+						"Fist",
+						false,
+						"Core Breaker",
+						0.85
+					}
+					game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvent"):WaitForChild("HitBox"):FireServer(unpack(args))
+					task.wait(0.02)
+				end
+			end)
+		end
+	end
+})
