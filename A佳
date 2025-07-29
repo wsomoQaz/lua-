@@ -11,15 +11,15 @@ local OrionLib = {
         Connections = {},
         Flags = {},
         Themes = {
-        Default = {
-            Main = Color3.fromRGB(255, 255, 255),
-            Second = Color3.fromRGB(240, 240, 240),
-            Stroke = Color3.fromRGB(200, 200, 200),
-            Divider = Color3.fromRGB(230, 230, 230),
-            Text = Color3.fromRGB(0, 0, 0),
-            TextDark = Color3.fromRGB(50, 50, 50)
-        }
-    },
+    Default = {
+        Main = Color3.fromRGB(255, 255, 255),       -- 主颜色（不影响透明度）
+        Second = Color3.fromRGB(255, 255, 255),     -- 次颜色（也保持白）
+        Stroke = Color3.fromRGB(255, 255, 255),     -- 边框颜色（纯白，可考虑不显示）
+        Divider = Color3.fromRGB(255, 255, 255),    -- 分割线颜色
+        Text = Color3.fromRGB(255, 255, 255),       -- 白色文字
+        TextDark = Color3.fromRGB(230, 230, 230)    -- 略暗一点的白色
+    }
+}
         SelectedTheme = "Default",
         Folder = nil,
         SaveCfg = false
