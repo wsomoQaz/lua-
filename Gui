@@ -790,3 +790,137 @@ Tab:AddToggle({
 		end
 	end
 })
+
+local MainTab = Window:MakeTab({
+    Name = "自瞄",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+local camera = workspace.CurrentCamera
+
+-- 控制变量
+local fovEnabled = false
+local aimbotEnabled = false
+local teamCheckEnabled = true
+local fovRadius = 100
+
+-- Drawing 圆圈与文本
+local FovCircle = Drawing.new("Circle")
+FovCircle.Visible = false
+FovCircle.Color = Color3.fromRGB(0, 170, 255)
+FovCircle.Thickness = 2
+FovCircle.NumSides = 100
+FovCircle.Filled = false
+FovCircle.Position = Vector2.new(camera.ViewportSize.X/2, camera.ViewportSize.Y/2)
+FovCircle.Radius = fovRadius
+
+local NameLabel = Drawing.new("Text")
+NameLabel.Visible = false
+NameLabel.Color = Color3.fromRGB(0, 255, 255)
+NameLabel.Size = 18
+NameLabel.Center = true
+NameLabel.Outline = true
+NameLabel.OutlineColor = Color3.new(0, 0, 0)
+
+local DistanceLabel = Drawing.new("Text")
+DistanceLabel.Visible = false
+DistanceLabel.Color = Color3.fromRGB(0, 255, 255)
+DistanceLabel.Size = 14
+DistanceLabel.Center = true
+DistanceLabel.Outline = true
+DistanceLabel.OutlineColor = Color3.new(0, 0, 0)
+
+-- 控件绑定
+MainTab:AddToggle({
+    Name = "显示 FOV 圆",
+    Default = false,
+    Callback = function(value)
+        fovEnabled = value
+        FovCircle.Visible = value
+    end
+})
+
+MainTab:AddToggle({
+    Name = "启用 Aimbot",
+    Default = false,
+    Callback = function(value)
+        aimbotEnabled = value
+    end
+})
+
+MainTab:AddToggle({
+    Name = "开启阵容判断（TeamCheck）",
+    Default = true,
+    Callback = function(value)
+        teamCheckEnabled = value
+    end
+})
+
+MainTab:AddTextbox({
+    Name = "设置 FOV 半径",
+    Default = "100",
+    TextDisappear = false,
+    Callback = function(value)
+        local n = tonumber(value)
+        if n then
+            fovRadius = n
+            FovCircle.Radius = n
+        end
+    end
+})
+
+-- Aimbot主逻辑
+RunService.RenderStepped:Connect(function()
+    if not (fovEnabled and aimbotEnabled) then
+        NameLabel.Visible = false
+        DistanceLabel.Visible = false
+        return
+    end
+
+    local closestTarget = nil
+    local shortestDist = math.huge
+    local screenCenter = Vector2.new(camera.ViewportSize.X/2, camera.ViewportSize.Y/2)
+
+    for _, target in ipairs(Players:GetPlayers()) do
+        if target ~= player and target.Character and target.Character:FindFirstChild("Head") then
+            if not teamCheckEnabled or target.Team ~= player.Team then
+                local headPos, onScreen = camera:WorldToViewportPoint(target.Character.Head.Position)
+                if onScreen then
+                    local dist = (Vector2.new(headPos.X, headPos.Y) - screenCenter).Magnitude
+                    if dist <= fovRadius and dist < shortestDist then
+                        shortestDist = dist
+                        closestTarget = target
+                    end
+                end
+            end
+        end
+    end
+
+    if closestTarget and closestTarget.Character and closestTarget.Character:FindFirstChild("Head") then
+        local headPos = closestTarget.Character.Head.Position
+        camera.CFrame = CFrame.new(camera.CFrame.Position, headPos)
+
+        local screenPos, onScreen = camera:WorldToViewportPoint(headPos)
+        if onScreen then
+            NameLabel.Visible = true
+            DistanceLabel.Visible = true
+            NameLabel.Position = Vector2.new(screenPos.X, screenPos.Y - 25)
+            DistanceLabel.Position = Vector2.new(screenPos.X, screenPos.Y - 5)
+            NameLabel.Text = closestTarget.Name
+            local dist = math.floor((player.Character.Head.Position - headPos).Magnitude)
+            DistanceLabel.Text = tostring(dist) .. " studs"
+        else
+            NameLabel.Visible = false
+            DistanceLabel.Visible = false
+        end
+    else
+        NameLabel.Visible = false
+        DistanceLabel.Visible = false
+    end
+end)
+
+OrionLib:Init()
