@@ -923,4 +923,78 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
-OrionLib:Init()
+local Tab = Window:MakeTab({
+    Name = "控制面板",
+    Icon = "rbxassetid://7734068321",
+    PremiumOnly = false
+})
+
+-- 控制所有玩家 or 自己
+local AllPlayers = false -- 设置为 true 表示作用所有人
+
+-- 主函数：改变头部大小
+local function changeHeadSize(player, size)
+    local function resize(char)
+        local head = char:FindFirstChild("Head")
+        if head then
+            head.Size = Vector3.new(size, size, size)
+            head.Mesh:Destroy() -- 清除默认头部形状（如球形），否则会拉伸错误
+
+            -- 删除旧焊点
+            for _, v in pairs(head:GetChildren()) do
+                if v:IsA("Weld") or v:IsA("Motor6D") then
+                    v:Destroy()
+                end
+            end
+
+            -- 焊接回角色（避免掉头）
+            local torso = char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso")
+            if torso then
+                local weld = Instance.new("WeldConstraint")
+                weld.Part0 = head
+                weld.Part1 = torso
+                weld.Parent = head
+                head.CFrame = torso.CFrame * CFrame.new(0, 1.5, 0)
+            end
+        end
+    end
+
+    if player.Character then
+        resize(player.Character)
+    end
+    player.CharacterAdded:Connect(resize)
+end
+
+-- 添加文本框控件
+Tab:AddTextbox({
+    Name = "输入头部尺寸（数字）",
+    Default = "3",
+    TextDisappear = true,
+    Callback = function(Value)
+        local size = tonumber(Value)
+        if not size then
+            OrionLib:MakeNotification({
+                Name = "错误",
+                Content = "请输入有效的数字！",
+                Image = "rbxassetid://7733991144",
+                Time = 3
+            })
+            return
+        end
+
+        if AllPlayers then
+            for _, p in pairs(Players:GetPlayers()) do
+                changeHeadSize(p, size)
+            end
+        else
+            changeHeadSize(LocalPlayer, size)
+        end
+
+        OrionLib:MakeNotification({
+            Name = "成功",
+            Content = "头部大小已设置为：" .. size,
+            Image = "rbxassetid://7734053493",
+            Time = 2
+        })
+    end
+})
